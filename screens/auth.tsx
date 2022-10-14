@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Image, StyleSheet, TouchableOpacity } from "react-native";
 
-import gif from "../assets/gifs/scam.gif";
+import gif from "../assets/gifs/eyes.gif";
 
 import { Text, View } from "../components/Themed";
 import { RootTabScreenProps } from "../types";

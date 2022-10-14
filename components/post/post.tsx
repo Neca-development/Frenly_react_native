@@ -1,16 +1,32 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Linking, Pressable, Text, View } from "react-native";
 import Button from "../Button";
 
+import { useMutation, useQuery } from "@apollo/client";
+import { useWalletConnect } from "@walletconnect/react-native-dapp";
+import { id } from "ethers/lib/utils";
 import Collapsible from "react-native-collapsible";
 import commentIcon from "../../assets/icons/comment.png";
 import cycleIcon from "../../assets/icons/cycle.png";
 import heartIcon from "../../assets/icons/heart.png";
+import { useGetWalletProfileId } from "../../contract/lens-hub.api";
+import {
+	useBindWithLensIdMutation,
+	useMirrorPostMutation,
+	usePublishContentMutation,
+	useRemoveContentMutation,
+} from "../../store/auth/auth.api";
+import { CREATE_POST_TYPED_DATA } from "../../store/lens/add-post.mutation";
+import { GET_PUBLICATIONS } from "../../store/lens/get-publication.query";
+import { LIKE_TO_POST } from "../../store/lens/post/add-like.mutation";
+import { CREATE_MIRROR_TYPED_DATA } from "../../store/lens/post/add-mirror.mutation";
+import { CANCEL_LIKE_TO_POST } from "../../store/lens/post/cancel-like.mutation";
+import { GET_POST_QUERY } from "../../store/lens/post/get-post.query";
+import { GET_REACTIONS } from "../../store/lens/post/get-reaction.query";
+import Comments from "../Comments";
 
 interface IPostProps {
 	isAddCap: boolean;
-	isLikeRequest: boolean;
 	data: {
 		avatar?: any;
 		profileId: number;
@@ -39,10 +55,263 @@ interface IPostProps {
 }
 
 function Post(props: IPostProps) {
-	const { data, isAddCap, isLikeRequest } = props;
+	const { data, isAddCap } = props;
 	const [isCommentsCollapsed, changeCommentsCollapsed] = useState(true);
 
-	const navigation = useNavigation();
+	const connector = useWalletConnect();
+
+	const { value: myProfileId } = useGetWalletProfileId(
+		connector.accounts[0] || ""
+	);
+	// const { state: postState, send: postWithSig } = usePostWithSig();
+	// const { state: mirrorState, send: mirrorWithSig } = useMirrorWithSig();
+	const [addPostToLens, postToLensData] = useMutation(CREATE_POST_TYPED_DATA);
+	const [publishContent] = usePublishContentMutation();
+	const [bindContentIdWithLens] = useBindWithLensIdMutation();
+	const [removeContent] = useRemoveContentMutation();
+	const [isLoading, setIsLoading] = useState(false);
+	const [likePostToLens, dataLikes] = useMutation(LIKE_TO_POST);
+	const [cancelLikePostToLens, dataCancelLikes] =
+		useMutation(CANCEL_LIKE_TO_POST);
+	const [isLikeRequest, setIsLikeRequest] = useState(false);
+
+	const { data: comments, refetch: refetchComments } = useQuery(
+		GET_PUBLICATIONS,
+		{
+			variables: {
+				request: {
+					commentsOf: data.id,
+				},
+			},
+		}
+	);
+
+	const { data: postData, refetch: refetchPost } = useQuery(GET_POST_QUERY, {
+		variables: {
+			request: {
+				publicationId: data.id,
+			},
+		},
+	});
+
+	const [mirrorPublication, dataMirrorPublication] = useMutation(
+		CREATE_MIRROR_TYPED_DATA
+	);
+
+	const { data: publicationIsReact, refetch } = useQuery(GET_REACTIONS, {
+		variables: {
+			request: {
+				publicationIds: [id],
+			},
+			requestReaction: {
+				profileId: myProfileId,
+			},
+		},
+		skip: typeof id == "number",
+	});
+
+	const [mirrorPost] = useMirrorPostMutation();
+
+	useEffect(() => {
+		console.log(
+			"🚀 ~ file: post.tsx ~ line 123 ~ useEffect ~ myProfileId",
+			myProfileId
+		);
+	}, [myProfileId]);
+
+	// const addPost = async () => {
+	// 	setIsLoading(true);
+	// 	if (id) {
+	// 		try {
+	// 			const publishedPost = await publishContent({
+	// 				contentId: id.toString(),
+	// 			});
+	// 			// @ts-ignore
+
+	// 			const typeD = await addPostToLens({
+	// 				variables: {
+	// 					request: {
+	// 						profileId: myProfileId,
+	// 						// @ts-ignore
+	// 						contentURI: publishedPost.data.data,
+	// 						collectModule: {
+	// 							revertCollectModule: true,
+	// 						},
+	// 						referenceModule: {
+	// 							followerOnlyReferenceModule: false,
+	// 						},
+	// 					},
+	// 				},
+	// 			});
+
+	// 			const typedData = typeD?.data?.createPostTypedData?.typedData;
+
+	// 			const signature = await signedTypeData(
+	// 				typedData.domain,
+	// 				typedData.types,
+	// 				typedData.value,
+	// 				library?.getSigner()
+	// 			);
+
+	// 			const { v, r, s } = splitSignature(signature);
+
+	// 			const receipt = await postWithSig({
+	// 				profileId: typedData.value.profileId,
+	// 				contentURI: typedData.value.contentURI,
+	// 				collectModule: typedData.value.collectModule,
+	// 				collectModuleInitData: typedData.value.collectModuleInitData,
+	// 				referenceModule: typedData.value.referenceModule,
+	// 				referenceModuleInitData: typedData.value.referenceModuleInitData,
+	// 				sig: {
+	// 					v,
+	// 					r,
+	// 					s,
+	// 					deadline: typedData.value.deadline,
+	// 				},
+	// 			});
+	// 			await bindContentIdWithLens({
+	// 				contentId: id.toString(),
+	// 				lensId:
+	// 					Number(receipt?.logs[0]?.topics[2]).toString(16).length === 1
+	// 						? `0x${Number(receipt?.logs[0]?.topics[1]).toString(
+	// 								16
+	// 						  )}-0x0${Number(receipt?.logs[0]?.topics[2]).toString(16)}`
+	// 						: `0x${Number(receipt?.logs[0]?.topics[1]).toString(
+	// 								16
+	// 						  )}-0x${Number(receipt?.logs[0]?.topics[2]).toString(16)}`,
+	// 			});
+	// 		} catch (error) {
+	// 			console.log(error);
+	// 		} finally {
+	// 			setIsLoading(false);
+	// 			refetch();
+	// 			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+	// 			refetchInfo && (await refetchInfo());
+	// 		}
+	// 	}
+	// };
+
+	// const declinePost = async () => {
+	// 	if (id) {
+	// 		await removeContent({ contentId: id.toString() });
+	// 	}
+	// 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+	// 	refetchInfo && (await refetchInfo());
+	// };
+
+	// const likeHandler = async () => {
+	// 	console.log("myProfileId", myProfileId);
+	// 	setIsLikeRequest(true);
+	// 	if (myProfileId) {
+	// 		console.log(id);
+	// 		console.log(
+	// 			"REACTION BEFORE",
+	// 			publicationIsReact.publications.items[0].reaction
+	// 		);
+
+	// 		if (publicationIsReact.publications.items[0].reaction == null) {
+	// 			try {
+	// 				setIsLikeRequest(true);
+	// 				await likePostToLens({
+	// 					variables: {
+	// 						request: {
+	// 							profileId: myProfileId,
+	// 							reaction: "UPVOTE",
+	// 							publicationId: id,
+	// 						},
+	// 					},
+	// 				});
+	// 			} catch (error) {
+	// 				console.error(error);
+	// 			}
+	// 			setIsLikeRequest(false);
+	// 		}
+
+	// 		if (publicationIsReact.publications.items[0].reaction == "UPVOTE") {
+	// 			setIsLikeRequest(true);
+	// 			cancelLikePostToLens({
+	// 				variables: {
+	// 					request: {
+	// 						profileId: myProfileId,
+	// 						reaction: "UPVOTE",
+	// 						publicationId: id,
+	// 					},
+	// 				},
+	// 			});
+	// 			setIsLikeRequest(false);
+	// 		}
+	// 	}
+
+	// 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+	// 	refetchInfo && (await refetchInfo());
+	// 	await refetch();
+	// 	await refetchPost();
+	// 	setIsLikeRequest(false);
+	// 	console.log(
+	// 		"REACTION AFTER",
+	// 		publicationIsReact.publications.items[0].reaction
+	// 	);
+	// };
+
+	// const mirrorHandler = async () => {
+	// 	const typeD = await mirrorPublication({
+	// 		variables: {
+	// 			request: {
+	// 				profileId: myProfileId,
+	// 				publicationId: id,
+	// 				referenceModule: null,
+	// 			},
+	// 		},
+	// 	});
+	// 	console.log(typeD);
+
+	// 	const typedData = typeD?.data?.createMirrorTypedData?.typedData;
+
+	// 	const signer = library?.getSigner();
+
+	// 	// if (!typedData) return
+	// 	const signature = await signedTypeData(
+	// 		typedData.domain,
+	// 		typedData.types,
+	// 		typedData.value,
+	// 		signer
+	// 	);
+
+	// 	const { v, r, s } = splitSignature(signature);
+
+	// 	const tx = await mirrorWithSig({
+	// 		profileId: typedData.value.profileId,
+	// 		profileIdPointed: typedData.value.profileIdPointed,
+	// 		pubIdPointed: typedData.value.pubIdPointed,
+	// 		referenceModuleData: typedData.value.referenceModuleData,
+	// 		referenceModule: typedData.value.referenceModule,
+	// 		referenceModuleInitData: typedData.value.referenceModuleInitData,
+	// 		sig: {
+	// 			v,
+	// 			r,
+	// 			s,
+	// 			deadline: typedData.value.deadline,
+	// 		},
+	// 	});
+
+	// 	console.log(tx?.logs);
+
+	// 	const newLensId =
+	// 		Number(tx?.logs[0]?.topics[2]).toString(16).length === 1
+	// 			? `0x${Number(tx?.logs[0]?.topics[1]).toString(16)}-0x0${Number(
+	// 					tx?.logs[0]?.topics[2]
+	// 			  ).toString(16)}`
+	// 			: `0x${Number(tx?.logs[0]?.topics[1]).toString(16)}-0x${Number(
+	// 					tx?.logs[0]?.topics[2]
+	// 			  ).toString(16)}`;
+
+	// 	console.log("ids", id, newLensId);
+
+	// 	await mirrorPost({ lensId: id as string, newLensId });
+
+	// 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+	// 	refetchInfo && (await refetchInfo());
+	// };
 
 	const renderMessage = () => {
 		let message;
@@ -141,12 +410,8 @@ function Post(props: IPostProps) {
 					{data.info}
 				</Text>
 
-				<Text>
-					{`http://135.181.216.90:49310/rest/token-images/${data.image}`}
-				</Text>
-
 				<View className="relative h-[300px] rounded-lg overflow-hidden mt-1">
-					{data.image ? (
+					{data.image !== null ? (
 						<Image
 							source={{
 								uri: `http://135.181.216.90:49310/rest/token-images/${data.image}`,
@@ -167,7 +432,7 @@ function Post(props: IPostProps) {
             className="object-cover"
           /> */}
 				</View>
-				{!isAddCap && (
+				{isAddCap && (
 					<View className="flex-row mt-2">
 						{/* <Pressable
 							// onClick={addPost}
@@ -232,7 +497,7 @@ function Post(props: IPostProps) {
 									resizeMode="contain"
 								/>
 								<Text className="text-md font-semibold text-gray-darker ml-1">
-									{/* {postData?.publication?.stats.totalUpvotes} */}0
+									{postData?.publication?.stats.totalUpvotes}
 								</Text>
 							</Pressable>
 							<Pressable
@@ -245,7 +510,7 @@ function Post(props: IPostProps) {
 									resizeMode="contain"
 								/>
 								<Text className="text-md font-semibold text-gray-darker ml-1">
-									{/* {comments?.publications?.items?.length} */}0
+									{comments?.publications?.items?.length ?? 0}
 								</Text>
 							</Pressable>
 							<Pressable
@@ -265,36 +530,12 @@ function Post(props: IPostProps) {
 					)}
 				</View>
 				<Collapsible collapsed={isCommentsCollapsed}>
-					<Text>
-						Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-						Cupiditate, iure nemo autem doloremque ipsum harum illo magni
-						veritatis quae vitae culpa ab corporis. Laborum voluptatibus
-						quisquam ipsam accusamus sed nemo veritatis reiciendis optio soluta
-						cum modi, omnis ea temporibus. Voluptatibus consequatur tempore
-						commodi praesentium quae corrupti numquam beatae aperiam, ipsum
-						iusto id, tenetur repellendus unde laboriosam ratione. Quam fugiat
-						quas non sed debitis dolore distinctio explicabo molestias, dolorem
-						aliquam alias neque perspiciatis, provident autem eum qui voluptates
-						incidunt laudantium odio! Culpa suscipit distinctio est ipsam
-						dolorem quam libero quisquam, quasi nobis aspernatur nostrum,
-						commodi eos porro repudiandae laudantium quas sunt facere. Suscipit
-						velit laborum veniam maxime, recusandae voluptate eius cupiditate
-						sit iusto expedita vitae sapiente, nostrum deserunt fugiat, quam
-						totam? Molestias alias vel inventore veniam. Magni sunt dolorem
-						molestiae tempora quos omnis officia cum eligendi impedit
-						consequuntur debitis, similique provident tenetur totam vitae quasi,
-						repellendus qui excepturi illum dolores! At delectus, neque facilis
-						natus voluptatem eos quis nobis ea magnam explicabo autem vitae iste
-						pariatur labore accusamus quisquam doloribus libero, sit illum quas
-						vero qui nam. Impedit, aliquid ullam. Hic ducimus corrupti nemo
-						praesentium non! Quia qui libero voluptatem ut animi illum possimus.
-						Deleniti repudiandae dolorum temporibus cupiditate dolores iusto
-						itaque ratione, consequatur laborum quo ullam aperiam explicabo
-						voluptatum, officiis tenetur vel ipsum tempora quae alias officia
-						atque quisquam nostrum? Sed quaerat praesentium, accusantium
-						reiciendis iure soluta labore consequuntur, explicabo modi placeat
-						ut necessitatibu
-					</Text>
+					<Comments
+						refetchComment={refetchComments}
+						data={comments}
+						pubId={data.id}
+						profileId={myProfileId}
+					/>
 				</Collapsible>
 			</View>
 		</View>

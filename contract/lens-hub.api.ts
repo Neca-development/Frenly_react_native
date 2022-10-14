@@ -1,6 +1,7 @@
 import "@ethersproject/shims";
 // import { useCall, useContractFunction } from '@usedapp/core'
 import { Contract, ethers } from "ethers";
+import { useEffect, useState } from "react";
 import "react-native-get-random-values";
 import { lensHubABI, lensHubContract } from "./lens-hub.contract";
 
@@ -13,21 +14,23 @@ const lensInterface = new ethers.utils.Interface(lensHubABI);
 const lensContract = new Contract(lensHubContract, lensInterface);
 
 export function useGetWalletProfileId(address: String) {
-	// const connector = useWalletConnect();
-	// const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/HCm-qNqCQm-NnbV9nHWxq9OnMHkUNvsg", 8001);
-	// const contract = new ethers.Contract(lensHubContract, lensHubABI, provider)
-	// contract.
-	// const { value, error } =
-	//   useCall({
-	//     contract: lensContract,
-	//     method: 'tokenOfOwnerByIndex',
-	//     args: [address, 0],
-	//   }) ?? {}
-	// if (error) {
-	//   console.error(error.message)
-	//   return
-	// }
-	// return value ? value[0]._hex : null
+	const [value, setValue] = useState<unknown>();
+	const [error, setError] = useState<unknown>();
+
+	useEffect(() => {
+		(async () => {
+			try {
+				const data = await lensContract.tokenOfOwnerByIndex([address, 0]);
+				console.log("🚀 ~ file: lens-hub.api.ts ~ line 24 ~ data", data);
+
+				setValue(data);
+			} catch (error) {
+				setError(error);
+			}
+		})();
+	}, [address]);
+
+	return { value, error };
 }
 
 export function useHaveProfile(address: string | undefined) {

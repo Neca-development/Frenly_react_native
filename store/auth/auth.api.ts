@@ -95,6 +95,18 @@ export const authApi = createApi({
 				};
 			},
 		}),
+		mirrorPost: builder.mutation<any, { lensId: string; newLensId: string }>({
+			query: (args) => {
+				console.log(args.lensId, args.newLensId);
+
+				return {
+					url: `content/${args.lensId}/repost/${args.newLensId}`,
+					method: "POST",
+
+					credentials: "omit",
+				};
+			},
+		}),
 		bindWithLensId: builder.mutation<
 			any,
 			{ contentId: string; lensId: string }
@@ -170,4 +182,5 @@ export const {
 	useGetFeedQuery,
 	useBindWithLensIdMutation,
 	useRemoveContentMutation,
+	useMirrorPostMutation,
 } = authApi;

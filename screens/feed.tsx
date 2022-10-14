@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Image, SafeAreaView, ScrollView, Text, View } from "react-native";
 import EyesIcon from "../assets/icons/eyes";
 import Button from "../components/Button";
@@ -33,10 +33,6 @@ function Feed() {
 		await drafts.refetch();
 	};
 
-	useEffect(() => {
-		console.log({ dataFeeds, drafts });
-	}, [dataFeeds, drafts]);
-
 	return (
 		<SafeAreaView style={safeViewAndroid.AndroidSafeArea}>
 			<View className="w-full pt-4 px-4 border-b border-border-color pb-3">
@@ -69,7 +65,6 @@ function Feed() {
 						return (
 							<Post
 								isAddCap={false}
-								isLikeRequest={false}
 								key={id}
 								data={{
 									avatar: mockImg,
