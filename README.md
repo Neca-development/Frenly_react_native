@@ -1,36 +1,16 @@
-# TypeScript Example
+# WalletConnect Example on Expo
 
-<p>
-  <!-- iOS -->
-  <img alt="Supports Expo iOS" longdesc="Supports Expo iOS" src="https://img.shields.io/badge/iOS-4630EB.svg?style=flat-square&logo=APPLE&labelColor=999999&logoColor=fff" />
-  <!-- Android -->
-  <img alt="Supports Expo Android" longdesc="Supports Expo Android" src="https://img.shields.io/badge/Android-4630EB.svg?style=flat-square&logo=ANDROID&labelColor=A4C639&logoColor=fff" />
-  <!-- Web -->
-  <img alt="Supports Expo Web" longdesc="Supports Expo Web" src="https://img.shields.io/badge/web-4630EB.svg?style=flat-square&logo=GOOGLE-CHROME&labelColor=4285F4&logoColor=fff" />
-</p>
+This is a simple example how to get `WalletConnect` up and running with `Expo` for React Native.
 
-```sh
-npx create-react-native-app -t with-typescript
-```
+## `WalletConnect`'s dependency on Node's `crypto` package
 
-TypeScript is a superset of JavaScript which gives you static types and powerful tooling in Visual Studio Code including autocompletion and useful inline warnings for type errors.
+`WalletConnect` uses node's built-in crypto package which is not available on iOS or Android.
+In order to work around this we can use `metro.config.js` to create aliases for different packages, this idea is from [here](https://learn.figment.io/tutorials/how-to-successfully-connect-to-a-celo-wallet-with-a-react-native-dapp).
+This will allow us to use `WalletConnect` directly from the `expo` client without having to eject the application.
 
-## 🚀 How to use
+## Getting Started
 
-#### Creating a new project
+Please go ahead and install the packages via `yarn install`, then, run `yarn start` or `expo start`.
+Once the build is complete and opened in the `Expo Go` app, connect your wallet by pressing the `Connect a wallet` button.
 
-- Install the CLI: `npm i -g expo-cli`
-- Create a project: `npx create-react-native-app -t with-typescript`
-- `cd` into the project
-
-### Adding TypeScript to existing projects
-
-- Create a blank TypeScript config: `touch tsconfig.json`
-- Run `yarn start` or `npm run start` to automatically configure TypeScript
-- Rename files to TypeScript, `.tsx` for React components and `.ts` for plain typescript files
-
-> 💡 You can disable the TypeScript setup in Expo CLI with the environment variable `EXPO_NO_TYPESCRIPT_SETUP=1 expo start`
-
-## 📝 Notes
-
-- [Expo TypeScript guide](https://docs.expo.dev/versions/latest/guides/typescript/)
+![alt text](./assets/gifs/walletconnect-expo-demo.gif)
