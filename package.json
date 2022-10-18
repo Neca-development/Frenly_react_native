@@ -1,11 +1,11 @@
 {
-  "name": "test-dapp",
+  "name": "frenly",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "expo start --tunnel",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "eject": "expo eject",
     "test": "jest --watchAll"

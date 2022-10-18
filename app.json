@@ -1,0 +1,38 @@
+{
+	"expo": {
+		"name": "Frenly",
+		"slug": "frenly",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/icons/heart.png",
+		"sdkVersion": "44.0.0",
+		"splash": {
+			"image": "./assets/images/splash.png",
+			"resizeMode": "cover",
+			"backgroundColor": "#2B59FE"
+		},
+		"updates": {
+			"fallbackToCacheTimeout": 0
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"bundleIdentifier": "unistory.app.frenly"
+		},
+		"android": {
+			"versionCode": 6,
+			"package": "app.unistory.frenly.apk",
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/icons/heart.png",
+				"backgroundColor": "#2B59FE"
+			}
+		},
+		"web": {
+			"favicon": "./assets/icons/heart.pngg"
+		},
+		"extra": {
+			"eas": {
+				"projectId": "cbb39077-f517-4049-876a-7145f93efb12"
+			}
+		}
+	}
+}

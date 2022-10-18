@@ -11,12 +11,20 @@ import { useGetFeedQuery } from "../store/auth/auth.api";
 import { GET_PUBLICATIONS } from "../store/lens/get-publication.query";
 
 import loader from "../assets/gifs/duck_loader.gif";
+import { logout } from "../store/auth/auth.slice";
+import { useAppDispatch } from "../store/store.hook";
+import { useWalletConnect } from "@walletconnect/react-native-dapp";
+import { RootStackParamList } from "../types";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-function Feed() {
+function Feed({
+	navigation,
+}: NativeStackScreenProps<RootStackParamList, "Feed">) {
 	const { data: dataFeeds, refetch: refetchFeeds } = useGetFeedQuery({
 		take: 10,
 		skip: 0,
 	});
+	const connector = useWalletConnect();
 	const drafts = useQuery(GET_PUBLICATIONS, {
 		variables: {
 			request: {
@@ -28,9 +36,18 @@ function Feed() {
 		},
 	});
 
+	const dispatch = useAppDispatch();
+
 	const refetchInfo = async () => {
 		refetchFeeds();
 		await drafts.refetch();
+	};
+
+	const logOut = async () => {
+		await dispatch(logOut);
+		await connector.killSession();
+
+		navigation.navigate("Auth");
 	};
 
 	return (
@@ -38,6 +55,7 @@ function Feed() {
 			<View className="w-full pt-4 px-4 border-b border-border-color pb-3">
 				<View className="flex-row justify-between items-center">
 					<EyesIcon />
+					<Button onPress={logOut} title="Log out"></Button>
 					<Button title="Add post"></Button>
 				</View>
 			</View>
