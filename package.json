@@ -37,6 +37,7 @@
     "expo-splash-screen": "~0.14.0",
     "expo-status-bar": "~1.2.0",
     "expo-web-browser": "~10.1.0",
+    "graphql": "^15.8.0",
     "https-browserify": "^1.0.0",
     "moment": "^2.29.4",
     "nativewind": "^2.0.11",

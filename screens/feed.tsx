@@ -44,7 +44,7 @@ function Feed({
 	};
 
 	const logOut = async () => {
-		await dispatch(logOut);
+		await dispatch(logout());
 		await connector.killSession();
 
 		navigation.navigate("Auth");

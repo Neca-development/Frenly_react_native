@@ -14,7 +14,7 @@ import { RootState } from "../store";
 import { logout } from "./auth.slice";
 
 const baseQuery = fetchBaseQuery({
-	baseUrl: `http://135.181.216.90:49310/rest/`,
+	baseUrl: `https://gm.frenly.cc/rest/`,
 	mode: "cors",
 
 	prepareHeaders: (headers, { getState }) => {

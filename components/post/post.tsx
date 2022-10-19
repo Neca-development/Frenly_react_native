@@ -414,7 +414,7 @@ function Post(props: IPostProps) {
 					{data.image !== null ? (
 						<Image
 							source={{
-								uri: `http://135.181.216.90:49310/rest/token-images/${data.image}`,
+								uri: `https://gm.frenly.cc/rest/token-images/${data.image}`,
 							}}
 							resizeMode="cover"
 							className="w-full h-full object-center"
