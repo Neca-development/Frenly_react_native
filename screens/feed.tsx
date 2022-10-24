@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import {
-	Image,
-	RefreshControl,
-	SafeAreaView,
-	ScrollView,
-	Text,
-	View,
+  Image,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
 } from "react-native";
 import EyesIcon from "../assets/icons/eyes";
 import Button from "../components/Button";
@@ -25,113 +25,114 @@ import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 function Feed({
-	navigation,
+  navigation,
 }: NativeStackScreenProps<RootStackParamList, "Feed">) {
-	const { data: dataFeeds, refetch: refetchFeeds } = useGetFeedQuery({
-		take: 10,
-		skip: 0,
-	});
-	const connector = useWalletConnect();
-	const drafts = useQuery(GET_PUBLICATIONS, {
-		variables: {
-			request: {
-				publicationIds: dataFeeds?.data.map((el: any) => el.lensId),
-				// profileId: accountId,
-				// publicationTypes: ['POST', 'COMMENT', 'MIRROR'],
-				// limit: 10,
-			},
-		},
-	});
-	const [isFeedRefreshing, setFeedRefreshing] = useState(false);
+  const { data: dataFeeds, refetch: refetchFeeds } = useGetFeedQuery({
+    take: 10,
+    skip: 0,
+  });
+  const connector = useWalletConnect();
+  const drafts = useQuery(GET_PUBLICATIONS, {
+    variables: {
+      request: {
+        publicationIds: dataFeeds?.data
+          .filter((el: any) => el.lensId != null)
+          .map((el: any) => el.lensId),
+      },
+    },
+  });
+  const filtered = dataFeeds?.data?.filter((el: any) => el.lensId != null);
+  console.log(filtered?.map((el: any) => el.lensId));
+  const [isFeedRefreshing, setFeedRefreshing] = useState(false);
 
-	const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
-	const refetchInfo = async () => {
-		setFeedRefreshing(true);
-		refetchFeeds();
-		await drafts.refetch();
-		setFeedRefreshing(false);
-	};
+  const refetchInfo = async () => {
+    setFeedRefreshing(true);
+    refetchFeeds();
+    await drafts.refetch();
+    setFeedRefreshing(false);
+  };
 
-	const logOut = async () => {
-		await dispatch(logout());
-		await connector.killSession();
+  const logOut = async () => {
+    await dispatch(logout());
+    await connector.killSession();
 
-		navigation.navigate("Auth");
-	};
+    navigation.navigate("Auth");
+  };
 
-	return (
-		<SafeAreaView style={safeViewAndroid.AndroidSafeArea}>
-			<View className="w-full pt-4 px-4 border-b border-border-color pb-3">
-				<View className="flex-row justify-between items-center">
-					<EyesIcon />
-					<Text className="text-xl font-bold ">frenly feed</Text>
-					<Button onPress={logOut} title="Log out"></Button>
-					<Button title="Add post"></Button>
-				</View>
-			</View>
-			<ScrollView
-				refreshControl={
-					<RefreshControl
-						onRefresh={refetchInfo}
-						refreshing={isFeedRefreshing}
-					/>
-				}
-			>
-				{dataFeeds ? (
-					drafts?.data?.publications?.items.map((el: any) => {
-						const {
-							createdAt,
-							collectModule,
-							profile,
-							metadata,
-							id,
-							stats,
-							mirrorOf,
-						} = el;
+  return (
+    <SafeAreaView style={safeViewAndroid.AndroidSafeArea}>
+      <View className="w-full pt-4 px-4 border-b border-border-color pb-3">
+        <View className="flex-row justify-between items-center">
+          <EyesIcon />
+          <Text className="text-xl font-bold ">frenly feed</Text>
+          <Button onPress={logOut} title="Log out"></Button>
+          <Button title="Add post"></Button>
+        </View>
+      </View>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            onRefresh={refetchInfo}
+            refreshing={isFeedRefreshing}
+          />
+        }
+      >
+        {dataFeeds ? (
+          drafts?.data?.publications?.items.map((el: any) => {
+            const {
+              createdAt,
+              collectModule,
+              profile,
+              metadata,
+              id,
+              stats,
+              mirrorOf,
+            } = el;
 
-						let index;
-						dataFeeds?.data?.forEach((element: any, _index: number) => {
-							if (element.lensId == id) {
-								index = _index;
-							}
-						});
+            let index;
+            dataFeeds?.data?.forEach((element: any, _index: number) => {
+              if (element.lensId == id) {
+                index = _index;
+              }
+            });
 
-						return (
-							<Post
-								isAddCap={false}
-								key={id}
-								data={{
-									avatar: mockImg,
-									from: metadata?.attributes[4].value,
-									to: metadata?.attributes[3].value,
-									contractAddress: metadata?.attributes[1].value,
-									info: metadata.description,
-									image: dataFeeds?.data[Number(index)]?.image,
-									name: profile.handle,
-									date: createdAt,
-									showDate: false,
-									messageType: metadata.attributes[5].value,
-									itemType: "nft",
-									totalUpvotes: stats.totalUpvotes,
-									totalMirror: stats.totalAmountOfMirrors,
-									id: id,
-									profileId: profile.id,
-									refetchInfo: refetchInfo,
-									txHash: metadata.attributes[8].value,
-									blockchainType: metadata.attributes[7].value,
-									isMirror: dataFeeds?.data[Number(index)]?.isMirror,
-									handleMirror: mirrorOf?.profile.handle,
-								}}
-							></Post>
-						);
-					})
-				) : (
-					<Image source={loader} />
-				)}
-			</ScrollView>
-		</SafeAreaView>
-	);
+            return (
+              <Post
+                isAddCap={false}
+                key={id}
+                data={{
+                  avatar: mockImg,
+                  from: metadata?.attributes[4].value,
+                  to: metadata?.attributes[3].value,
+                  contractAddress: metadata?.attributes[1].value,
+                  info: metadata.description,
+                  image: dataFeeds?.data[Number(index)]?.image,
+                  name: profile.handle,
+                  date: createdAt,
+                  showDate: false,
+                  messageType: metadata.attributes[5].value,
+                  itemType: "nft",
+                  totalUpvotes: stats.totalUpvotes,
+                  totalMirror: stats.totalAmountOfMirrors,
+                  id: id,
+                  profileId: profile.id,
+                  refetchInfo: refetchInfo,
+                  txHash: metadata.attributes[8].value,
+                  blockchainType: metadata.attributes[7].value,
+                  isMirror: dataFeeds?.data[Number(index)]?.isMirror,
+                  handleMirror: mirrorOf?.profile.handle,
+                }}
+              ></Post>
+            );
+          })
+        ) : (
+          <Image source={loader} />
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 export default Feed;
