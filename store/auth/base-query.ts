@@ -18,9 +18,9 @@ const baseQuery = fetchBaseQuery({
 	baseUrl: SERVER_URL,
 	mode: "cors",
 
-	prepareHeaders: (headers, { getState }) => {
-		const aToken = (getState() as RootState).auth.accessToken;
-		const rToken = (getState() as RootState).auth.refreshToken;
+	prepareHeaders: async (headers, { getState }) => {
+		const aToken = await AsyncStorageLib.getItem("back_auth_token");
+		const rToken = await AsyncStorageLib.getItem("back_refresh_token");
 		console.log("🚀 ~ file: base-query.ts ~ line 25 ~ aToken", aToken);
 		console.log("🚀 ~ file: base-query.ts ~ line 27 ~ rToken", rToken);
 		// If we have a token set in state, let's assume that we should be passing it.
@@ -51,7 +51,7 @@ export const baseQueryWithReauth: BaseQueryFn<
 	if (result.error && result.error.status === 401) {
 		if (!mutex.isLocked()) {
 			const release = await mutex.acquire();
-			const refreshToken = AsyncStorageLib.getItem("back_refresh_token");
+			const refreshToken = await AsyncStorageLib.getItem("back_refresh_token");
 
 			try {
 				const refreshResult = await baseQuery(
