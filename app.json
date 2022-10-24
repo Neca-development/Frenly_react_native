@@ -1,8 +1,9 @@
 {
 	"expo": {
-		"name": "Frenly",
+		"name": "frenly",
 		"slug": "frenly",
 		"version": "1.0.0",
+		"scheme": "frenly",
 		"orientation": "portrait",
 		"icon": "./assets/icons/heart.png",
 		"sdkVersion": "44.0.0",
