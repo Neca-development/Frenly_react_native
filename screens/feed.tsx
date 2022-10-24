@@ -41,8 +41,6 @@ function Feed({
       },
     },
   });
-  const filtered = dataFeeds?.data?.filter((el: any) => el.lensId != null);
-  console.log(filtered?.map((el: any) => el.lensId));
   const [isFeedRefreshing, setFeedRefreshing] = useState(false);
 
   const dispatch = useAppDispatch();
