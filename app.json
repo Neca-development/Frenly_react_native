@@ -5,12 +5,12 @@
 		"version": "1.0.0",
 		"scheme": "frenly",
 		"orientation": "portrait",
-		"icon": "./assets/icons/heart.png",
+		"icon": "./assets/icons/app_icon.png",
 		"sdkVersion": "44.0.0",
 		"splash": {
-			"image": "./assets/images/splash.png",
-			"resizeMode": "cover",
-			"backgroundColor": "#2B59FE"
+			"image": "./assets/icons/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#FFF"
 		},
 		"updates": {
 			"fallbackToCacheTimeout": 0
@@ -23,12 +23,12 @@
 			"versionCode": 6,
 			"package": "app.unistory.frenly.apk",
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/icons/heart.png",
-				"backgroundColor": "#2B59FE"
+				"foregroundImage": "./assets/icons/app_icon.png",
+				"backgroundColor": "#FFF"
 			}
 		},
 		"web": {
-			"favicon": "./assets/icons/heart.pngg"
+			"favicon": "./assets/icons/eyes.pngg"
 		},
 		"extra": {
 			"eas": {

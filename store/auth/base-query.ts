@@ -9,19 +9,20 @@ import type {
 	BaseQueryFn,
 } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { Mutex } from "async-mutex";
+import { SERVER_URL } from "../../constants/Api";
 import { RootState } from "../store";
 
 import { logout } from "./auth.slice";
 
 const baseQuery = fetchBaseQuery({
-	baseUrl: `https://gm.frenly.cc/rest/`,
+	baseUrl: SERVER_URL,
 	mode: "cors",
 
 	prepareHeaders: (headers, { getState }) => {
 		const aToken = (getState() as RootState).auth.accessToken;
 		const rToken = (getState() as RootState).auth.refreshToken;
-		console.log(aToken);
-		console.log(rToken);
+		console.log("🚀 ~ file: base-query.ts ~ line 25 ~ aToken", aToken);
+		console.log("🚀 ~ file: base-query.ts ~ line 27 ~ rToken", rToken);
 		// If we have a token set in state, let's assume that we should be passing it.
 		if (aToken !== undefined) {
 			headers.set("authorization", `Bearer ${aToken}`);

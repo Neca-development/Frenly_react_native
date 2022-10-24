@@ -1,5 +1,12 @@
-import React from "react";
-import { Image, SafeAreaView, ScrollView, Text, View } from "react-native";
+import React, { useState } from "react";
+import {
+	Image,
+	RefreshControl,
+	SafeAreaView,
+	ScrollView,
+	Text,
+	View,
+} from "react-native";
 import EyesIcon from "../assets/icons/eyes";
 import Button from "../components/Button";
 import Post from "../components/post/post";
@@ -35,12 +42,15 @@ function Feed({
 			},
 		},
 	});
+	const [isFeedRefreshing, setFeedRefreshing] = useState(false);
 
 	const dispatch = useAppDispatch();
 
 	const refetchInfo = async () => {
+		setFeedRefreshing(true);
 		refetchFeeds();
 		await drafts.refetch();
+		setFeedRefreshing(false);
 	};
 
 	const logOut = async () => {
@@ -55,12 +65,19 @@ function Feed({
 			<View className="w-full pt-4 px-4 border-b border-border-color pb-3">
 				<View className="flex-row justify-between items-center">
 					<EyesIcon />
+					<Text className="text-xl font-bold ">frenly feed</Text>
 					<Button onPress={logOut} title="Log out"></Button>
 					<Button title="Add post"></Button>
 				</View>
 			</View>
-			<ScrollView>
-				<Text className="text-3xl font-bold mt-4 px-4">Frenly Feed</Text>
+			<ScrollView
+				refreshControl={
+					<RefreshControl
+						onRefresh={refetchInfo}
+						refreshing={isFeedRefreshing}
+					/>
+				}
+			>
 				{dataFeeds ? (
 					drafts?.data?.publications?.items.map((el: any) => {
 						const {

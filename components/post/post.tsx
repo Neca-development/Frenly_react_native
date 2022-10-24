@@ -24,6 +24,7 @@ import { CANCEL_LIKE_TO_POST } from "../../store/lens/post/cancel-like.mutation"
 import { GET_POST_QUERY } from "../../store/lens/post/get-post.query";
 import { GET_REACTIONS } from "../../store/lens/post/get-reaction.query";
 import Comments from "../Comments";
+import { SERVER_URL } from "../../constants/Api";
 
 interface IPostProps {
 	isAddCap: boolean;
@@ -414,7 +415,7 @@ function Post(props: IPostProps) {
 					{data.image !== null ? (
 						<Image
 							source={{
-								uri: `https://gm.frenly.cc/rest/token-images/${data.image}`,
+								uri: `${SERVER_URL}token-images/${data.image}`,
 							}}
 							resizeMode="cover"
 							className="w-full h-full object-center"
