@@ -12,6 +12,7 @@ declare global {
 export type RootStackParamList = {
   Auth: undefined;
   Feed: undefined;
+  Profile: { id: number };
   Modal: undefined;
   NotFound: undefined;
 };

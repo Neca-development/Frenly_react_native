@@ -23,6 +23,7 @@ import { useAppDispatch } from "../store/store.hook";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useGetWalletProfileId } from "../contract/lens-hub.api";
 
 function Feed({
   navigation,
@@ -32,6 +33,10 @@ function Feed({
     skip: 0,
   });
   const connector = useWalletConnect();
+
+  const { value: myProfileId } = useGetWalletProfileId(
+    connector.accounts[0] || ""
+  );
   const drafts = useQuery(GET_PUBLICATIONS, {
     variables: {
       request: {
@@ -59,6 +64,13 @@ function Feed({
     navigation.navigate("Auth");
   };
 
+  const openProfile = (id: number) => {
+    if (id == null) {
+      return;
+    }
+    navigation.navigate(`Profile`, { id });
+  };
+
   return (
     <SafeAreaView style={safeViewAndroid.AndroidSafeArea}>
       <View className="w-full pt-4 px-4 border-b border-border-color pb-3">
@@ -66,7 +78,12 @@ function Feed({
           <EyesIcon />
           <Text className="text-xl font-bold ">frenly feed</Text>
           <Button onPress={logOut} title="Log out"></Button>
-          <Button title="Add post"></Button>
+          <Button
+            onPress={() =>
+              navigation.navigate("Profile", { id: Number(myProfileId) })
+            }
+            title="Add post"
+          ></Button>
         </View>
       </View>
       <ScrollView
@@ -100,6 +117,7 @@ function Feed({
               <Post
                 isAddCap={false}
                 key={id}
+                openProfile={openProfile}
                 data={{
                   avatar: mockImg,
                   from: metadata?.attributes[4].value,
