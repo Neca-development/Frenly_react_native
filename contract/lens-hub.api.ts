@@ -10,41 +10,50 @@ import { lensHubABI, lensHubContract } from "./lens-hub.contract";
 
 //   return await contract.tokenOfOwnerByIndex(address, 0)
 // }
-const lensInterface = new ethers.utils.Interface(lensHubABI);
-const lensContract = new Contract(lensHubContract, lensInterface);
+const provider = new ethers.providers.JsonRpcProvider(
+  "https://polygon-mumbai.g.alchemy.com/v2/HCm-qNqCQm-NnbV9nHWxq9OnMHkUNvsg",
+  80001
+);
+// const lensInterface = new ethers.utils.Interface(lensHubABI);
+const lensContract = new Contract(lensHubContract, lensHubABI, provider);
 
 export function useGetWalletProfileId(address: String) {
-	const [value, setValue] = useState<unknown>();
-	const [error, setError] = useState<unknown>();
+  const [value, setValue] = useState<unknown>();
+  const [error, setError] = useState<unknown>();
 
-	useEffect(() => {
-		(async () => {
-			try {
-				const data = await lensContract.tokenOfOwnerByIndex([address, 0]);
-				console.log("🚀 ~ file: lens-hub.api.ts ~ line 24 ~ data", data);
+  useEffect(() => {
+    (async () => {
+      try {
+        let data = await lensContract.tokenOfOwnerByIndex(address, 0);
+        data = JSON.parse(data);
+        console.log(
+          "🚀 ~ file: lens-hub.api.ts ~ line 24 ~ data",
+          "0x" + data.toString(16)
+        );
 
-				setValue(data);
-			} catch (error) {
-				setError(error);
-			}
-		})();
-	}, [address]);
+        setValue("0x" + data.toString(16));
+      } catch (error) {
+        console.log("🚀 ~ file: lens-hub.api.ts ~ line 32 ~ error", error);
+        setError(error);
+      }
+    })();
+  }, [address]);
 
-	return { value, error };
+  return { value, error };
 }
 
 export function useHaveProfile(address: string | undefined) {
-	// const { value, error } =
-	//   useCall({
-	//     contract: lensContract,
-	//     method: 'balanceOf',
-	//     args: [address],
-	//   }) ?? {}
-	// if (error) {
-	//   console.error(error.message)
-	//   return
-	// }
-	// return value ? Number.parseInt(value[0]._hex, 16) : null
+  // const { value, error } =
+  //   useCall({
+  //     contract: lensContract,
+  //     method: 'balanceOf',
+  //     args: [address],
+  //   }) ?? {}
+  // if (error) {
+  //   console.error(error.message)
+  //   return
+  // }
+  // return value ? Number.parseInt(value[0]._hex, 16) : null
 }
 
 // export function usePostWithSig() {

@@ -1,12 +1,12 @@
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import type {
-	FetchArgs,
-	FetchBaseQueryError,
+  FetchArgs,
+  FetchBaseQueryError,
 } from "@reduxjs/toolkit/dist/query";
 import { fetchBaseQuery } from "@reduxjs/toolkit/dist/query";
 import type {
-	BaseQueryApi,
-	BaseQueryFn,
+  BaseQueryApi,
+  BaseQueryFn,
 } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { Mutex } from "async-mutex";
 import { SERVER_URL } from "../../constants/Api";
@@ -15,75 +15,75 @@ import { RootState } from "../store";
 import { logout } from "./auth.slice";
 
 const baseQuery = fetchBaseQuery({
-	baseUrl: SERVER_URL,
-	mode: "cors",
+  baseUrl: SERVER_URL,
+  mode: "cors",
 
-	prepareHeaders: async (headers, { getState }) => {
-		const aToken = await AsyncStorageLib.getItem("back_auth_token");
-		const rToken = await AsyncStorageLib.getItem("back_refresh_token");
-		console.log("🚀 ~ file: base-query.ts ~ line 25 ~ aToken", aToken);
-		console.log("🚀 ~ file: base-query.ts ~ line 27 ~ rToken", rToken);
-		// If we have a token set in state, let's assume that we should be passing it.
-		if (aToken !== undefined) {
-			headers.set("authorization", `Bearer ${aToken}`);
-		}
+  prepareHeaders: async (headers, { getState }) => {
+    const aToken = await AsyncStorageLib.getItem("back_access_token");
+    const rToken = await AsyncStorageLib.getItem("back_refresh_token");
+    console.log("🚀 ~ file: base-query.ts ~ line 25 ~ aToken", aToken);
+    console.log("🚀 ~ file: base-query.ts ~ line 27 ~ rToken", rToken);
+    // If we have a token set in state, let's assume that we should be passing it.
+    if (aToken !== undefined) {
+      headers.set("authorization", `Bearer ${aToken}`);
+    }
 
-		// headers.set('refresh-token', `${rToken}`)
+    // headers.set('refresh-token', `${rToken}`)
 
-		return headers;
-	},
+    return headers;
+  },
 });
 
 const mutex = new Mutex();
 
 export const baseQueryWithReauth: BaseQueryFn<
-	string | FetchArgs,
-	unknown,
-	FetchBaseQueryError
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
 > = async (
-	arguments_: string | FetchArgs | never,
-	api: BaseQueryApi,
-	extraOptions: {}
+  arguments_: string | FetchArgs | never,
+  api: BaseQueryApi,
+  extraOptions: {}
 ) => {
-	await mutex.waitForUnlock();
-	let result = await baseQuery(arguments_, api, extraOptions);
+  await mutex.waitForUnlock();
+  let result = await baseQuery(arguments_, api, extraOptions);
 
-	if (result.error && result.error.status === 401) {
-		if (!mutex.isLocked()) {
-			const release = await mutex.acquire();
-			const refreshToken = await AsyncStorageLib.getItem("back_refresh_token");
+  if (result.error && result.error.status === 401) {
+    if (!mutex.isLocked()) {
+      const release = await mutex.acquire();
+      const refreshToken = await AsyncStorageLib.getItem("back_refresh_token");
+      console.log("REFRESH T", refreshToken);
+      try {
+        const refreshResult = await baseQuery(
+          {
+            url: "auth/refresh-token",
+            method: "POST",
+            body: {
+              refreshToken,
+            },
+          },
+          api,
+          extraOptions
+        );
 
-			try {
-				const refreshResult = await baseQuery(
-					{
-						url: "auth/refresh-token",
-						method: "POST",
-						body: {
-							refreshToken,
-						},
-					},
-					api,
-					extraOptions
-				);
+        if (refreshResult.data) {
+          // @ts-ignore
+          api.dispatch(refreshToken(refreshResult.data));
 
-				if (refreshResult.data) {
-					// @ts-ignore
-					api.dispatch(refreshToken(refreshResult.data));
+          // retry the initial query
+          result = await baseQuery(arguments_, api, extraOptions);
+        } else {
+          api.dispatch(logout());
+          // window.location.pathname = '/login'
+        }
+      } finally {
+        release();
+      }
+    } else {
+      await mutex.waitForUnlock();
+      result = await baseQuery(arguments_, api, extraOptions);
+    }
+  }
 
-					// retry the initial query
-					result = await baseQuery(arguments_, api, extraOptions);
-				} else {
-					api.dispatch(logout());
-					// window.location.pathname = '/login'
-				}
-			} finally {
-				release();
-			}
-		} else {
-			await mutex.waitForUnlock();
-			result = await baseQuery(arguments_, api, extraOptions);
-		}
-	}
-
-	return result;
+  return result;
 };

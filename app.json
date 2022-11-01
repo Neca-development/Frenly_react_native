@@ -1,39 +1,39 @@
 {
-	"expo": {
-		"name": "frenly",
-		"slug": "frenly",
-		"version": "1.0.0",
-		"scheme": "frenly",
-		"orientation": "portrait",
-		"icon": "./assets/icons/app_icon.png",
-		"sdkVersion": "44.0.0",
-		"splash": {
-			"image": "./assets/icons/splash.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#FFF"
-		},
-		"updates": {
-			"fallbackToCacheTimeout": 0
-		},
-		"assetBundlePatterns": ["**/*"],
-		"ios": {
-			"bundleIdentifier": "unistory.app.frenly"
-		},
-		"android": {
-			"versionCode": 6,
-			"package": "app.unistory.frenly.apk",
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/icons/app_icon.png",
-				"backgroundColor": "#FFF"
-			}
-		},
-		"web": {
-			"favicon": "./assets/icons/eyes.pngg"
-		},
-		"extra": {
-			"eas": {
-				"projectId": "cbb39077-f517-4049-876a-7145f93efb12"
-			}
-		}
-	}
+  "expo": {
+    "name": "frenly",
+    "slug": "frenly",
+    "version": "1.0.1",
+    "scheme": "frenly",
+    "orientation": "portrait",
+    "icon": "./assets/icons/app_icon.png",
+    "sdkVersion": "44.0.0",
+    "splash": {
+      "image": "./assets/icons/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "bundleIdentifier": "unistory.app.frenly"
+    },
+    "android": {
+      "versionCode": 7,
+      "package": "app.unistory.frenly.apk",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/app_icon.png",
+        "backgroundColor": "#FFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/icons/eyes.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "cbb39077-f517-4049-876a-7145f93efb12"
+      }
+    }
+  }
 }
