@@ -203,6 +203,15 @@ export const authApi = createApi({
         };
       },
     }),
+    getContentMetadata: builder.query<any, { contentId: string }>({
+      query: ({ contentId }) => {
+        return {
+          url: `content/${contentId}/metadata`,
+          method: "GET",
+          credentials: "omit",
+        };
+      },
+    }),
   }),
 });
 

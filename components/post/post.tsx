@@ -29,7 +29,7 @@ import { SERVER_URL } from "../../constants/Api";
 
 interface IPostProps {
   isUnpublishedPost: boolean;
-
+  addPost(id: number): void;
   openProfile?(id: number): void;
   data: {
     avatar?: any;
@@ -59,7 +59,7 @@ interface IPostProps {
 }
 
 function Post(props: IPostProps) {
-  const { data, isUnpublishedPost, openProfile = () => null } = props;
+  const { data, isUnpublishedPost, openProfile = () => null, addPost } = props;
   const [isCommentsCollapsed, changeCommentsCollapsed] = useState(true);
 
   const connector = useWalletConnect();
@@ -253,6 +253,7 @@ function Post(props: IPostProps) {
               style="flex-1 mr-3"
               textStyle="text-white text-sm font-semibold text-center"
               title="Publish"
+              onPress={addPost}
             />
             <Button
               buttonStyle="py-2 bg-error-bg"
