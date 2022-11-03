@@ -44,7 +44,7 @@ export default function Profile(props: IProfileProps) {
     refetch: refetchUnpublishedContent,
     isLoading: unpublishedLoading,
   } = useGetUnpublishedContentQuery(null);
-  console.log(postsData);
+
   const { data: dataProfile, refetch: refetchProfile } = useQuery(
     GET_DEFAULT_PROFILES,
     {

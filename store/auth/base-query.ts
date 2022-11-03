@@ -21,8 +21,8 @@ const baseQuery = fetchBaseQuery({
   prepareHeaders: async (headers, { getState }) => {
     const aToken = await AsyncStorageLib.getItem("back_access_token");
     const rToken = await AsyncStorageLib.getItem("back_refresh_token");
-    console.log("🚀 ~ file: base-query.ts ~ line 25 ~ aToken", aToken);
-    console.log("🚀 ~ file: base-query.ts ~ line 27 ~ rToken", rToken);
+    // console.log("🚀 ~ file: base-query.ts ~ line 25 ~ aToken", aToken);
+    // console.log("🚀 ~ file: base-query.ts ~ line 27 ~ rToken", rToken);
     // If we have a token set in state, let's assume that we should be passing it.
     if (aToken !== undefined) {
       headers.set("authorization", `Bearer ${aToken}`);
@@ -52,7 +52,6 @@ export const baseQueryWithReauth: BaseQueryFn<
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
       const refreshToken = await AsyncStorageLib.getItem("back_refresh_token");
-      console.log("REFRESH T", refreshToken);
       try {
         const refreshResult = await baseQuery(
           {

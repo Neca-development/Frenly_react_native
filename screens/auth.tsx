@@ -52,7 +52,6 @@ export default function Auth({ navigation }: RootTabScreenProps<"Auth">) {
 
   const createProfileHandler = async () => {
     if (connector.accounts[0]) {
-      console.log("mtfunc");
       await mutateFunction({
         variables: {
           request: {
@@ -64,43 +63,39 @@ export default function Auth({ navigation }: RootTabScreenProps<"Auth">) {
           },
         },
       });
-      console.log(
-        "🚀 ~ file: auth.tsx ~ line 64 ~ createProfileHandler ~ data",
-        data
-      );
     }
   };
 
-  useEffect(() => {
-    console.log("🚀 ~ file: auth.tsx ~ line 75 ~ Auth ~ error", error);
-  }, [error]);
+  // useEffect(() => {
+  //   console.log("🚀 ~ file: auth.tsx ~ line 75 ~ Auth ~ error", error);
+  // }, [error]);
 
   async function signIn() {
     let dataLogin;
-    console.log("====================================");
-    console.log(dataNonce);
-    console.log("====================================");
+    // console.log("====================================");
+    // console.log(dataNonce);
+    // console.log("====================================");
     const nonce = dataNonce?.data?.nonce;
-    console.log(nonce);
+    // console.log(nonce);
 
     if (nonce) {
-      console.log(nonce);
+      // console.log(nonce);
       const signature = await connector.signPersonalMessage([
         `Nonce: ${nonce}`,
         connector.accounts[0].toLowerCase(),
       ]);
 
-      console.log(
-        "🚀 ~ file: auth.tsx ~ line 80 ~ signIn ~ signature",
-        signature
-      );
+      // console.log(
+      //   "🚀 ~ file: auth.tsx ~ line 80 ~ signIn ~ signature",
+      //   signature
+      // );
 
       dataLogin = await triggerLogin({
         address: connector.accounts[0],
         signature: signature || "",
       }).unwrap();
     }
-    console.log(dataLogin);
+    // console.log(dataLogin);
     // @ts-ignore
     dispatch(setTokens({ ...dataLogin?.data }));
     // console.log("AaA", connector.accounts[0], library);
@@ -112,14 +107,14 @@ export default function Auth({ navigation }: RootTabScreenProps<"Auth">) {
     await login(connector.accounts[0], provider, connector);
 
     connector.accounts[0];
-    console.log(
-      "🚀 ~ file: auth.tsx ~ line 96 ~ signIn ~ wallet",
-      connector.accounts[0]
-    );
-    console.log(
-      "🚀 ~ file: auth.tsx ~ line 89 ~ signIn ~ countProfile",
-      isLanceProfileExist
-    );
+    // console.log(
+    //   "🚀 ~ file: auth.tsx ~ line 96 ~ signIn ~ wallet",
+    //   connector.accounts[0]
+    // );
+    // console.log(
+    //   "🚀 ~ file: auth.tsx ~ line 89 ~ signIn ~ countProfile",
+    //   isLanceProfileExist
+    // );
     if (!isLanceProfileExist?.data?.data) {
       try {
         await createProfileHandler();
@@ -130,14 +125,14 @@ export default function Auth({ navigation }: RootTabScreenProps<"Auth">) {
     navigation.navigate("Feed");
   }
 
-  useEffect(() => {
-    // if (connector.accounts[0]) navigation.push("Feed");
-    console.log(connector.accounts[0]);
-  }, connector.accounts);
+  // useEffect(() => {
+  //   // if (connector.accounts[0]) navigation.push("Feed");
+  //   console.log(connector.accounts[0]);
+  // }, connector.accounts);
 
-  useEffect(() => {
-    console.log(dataNonce, "nonce change");
-  }, [dataNonce]);
+  // useEffect(() => {
+  //   console.log(dataNonce, "nonce change");
+  // }, [dataNonce]);
 
   return (
     <View className="container flex-col justify-between items-center h-screen px-5 py-20">

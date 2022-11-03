@@ -12,26 +12,24 @@ export const login = async (
   // we request a challenge from the server
   const challengeResponse = await generateChallenge(address);
 
-  console.log("challengeRes", challengeResponse);
-
   // sign the text with the wallet
   const signature = await connector.signPersonalMessage([
     challengeResponse.data.challenge.text,
     address.toLowerCase(),
   ]);
 
-  console.log(
-    "🚀 ~ file: login-user.ts ~ line 24 ~ address, signature",
-    address,
-    signature
-  );
+  // console.log(
+  //   "🚀 ~ file: login-user.ts ~ line 24 ~ address, signature",
+  //   address,
+  //   signature
+  // );
   const data = await authenticate(address, signature);
-  console.log("🚀 ~ file: login-user.ts ~ line 24 ~ data", data);
+  // console.log("🚀 ~ file: login-user.ts ~ line 24 ~ data", data);
 
   const { accessToken } = data.data.authenticate;
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const { refreshToken } = data.data.authenticate;
-  console.log(accessToken);
+
   await AsyncStorageLib.setItem("lens_access_token", accessToken);
   await AsyncStorageLib.setItem("lens_refresh_token", refreshToken);
 

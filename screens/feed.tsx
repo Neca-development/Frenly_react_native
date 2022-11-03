@@ -64,7 +64,7 @@ function Feed({
   };
 
   const openProfile = (id: number) => {
-    console.log(id);
+    // console.log(id);
     if (id == null) {
       return;
     }

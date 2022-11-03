@@ -11,13 +11,7 @@ import commentIcon from "../../assets/icons/comment.png";
 import cycleIcon from "../../assets/icons/cycle.png";
 import heartIcon from "../../assets/icons/heart.png";
 import { useGetWalletProfileId } from "../../contract/lens-hub.api";
-import {
-  useBindWithLensIdMutation,
-  useMirrorPostMutation,
-  usePublishContentMutation,
-  useRemoveContentMutation,
-} from "../../store/auth/auth.api";
-import { CREATE_POST_TYPED_DATA } from "../../store/lens/add-post.mutation";
+import { useMirrorPostMutation } from "../../store/auth/auth.api";
 import { GET_PUBLICATIONS } from "../../store/lens/get-publication.query";
 import { LIKE_TO_POST } from "../../store/lens/post/add-like.mutation";
 import { CREATE_MIRROR_TYPED_DATA } from "../../store/lens/post/add-mirror.mutation";
@@ -30,6 +24,7 @@ import { SERVER_URL } from "../../constants/Api";
 interface IPostProps {
   isUnpublishedPost: boolean;
   addPost(id: number): void;
+  declinePost(id: number): void;
   openProfile?(id: number): void;
   data: {
     avatar?: any;
@@ -59,7 +54,13 @@ interface IPostProps {
 }
 
 function Post(props: IPostProps) {
-  const { data, isUnpublishedPost, openProfile = () => null, addPost } = props;
+  const {
+    data,
+    isUnpublishedPost,
+    openProfile = () => null,
+    addPost,
+    declinePost,
+  } = props;
   const [isCommentsCollapsed, changeCommentsCollapsed] = useState(true);
 
   const connector = useWalletConnect();
@@ -68,10 +69,6 @@ function Post(props: IPostProps) {
     connector.accounts[0] || ""
   );
 
-  const [addPostToLens, postToLensData] = useMutation(CREATE_POST_TYPED_DATA);
-  const [publishContent] = usePublishContentMutation();
-  const [bindContentIdWithLens] = useBindWithLensIdMutation();
-  const [removeContent] = useRemoveContentMutation();
   const [isLoading, setIsLoading] = useState(false);
   const [likePostToLens, dataLikes] = useMutation(LIKE_TO_POST);
   const [cancelLikePostToLens, dataCancelLikes] =
@@ -260,6 +257,7 @@ function Post(props: IPostProps) {
               style="flex-1"
               textStyle="text-error text-sm font-semibold text-center"
               title="Decline"
+              onPress={declinePost}
             />
           </View>
         )}

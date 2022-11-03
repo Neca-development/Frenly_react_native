@@ -85,7 +85,7 @@ export const authApi = createApi({
     }),
     publishContent: builder.mutation<any, { contentId: string }>({
       query: (args) => {
-        console.log("🚀 ~ file: auth.api.ts ~ line 88 ~ args", args);
+        // console.log("🚀 ~ file: auth.api.ts ~ line 88 ~ args", args);
 
         return {
           url: `content/${args.contentId}`,
@@ -95,9 +95,19 @@ export const authApi = createApi({
         };
       },
     }),
+    publishAdminPost: builder.mutation<any, { contentId: string }>({
+      query: (args) => {
+        return {
+          url: `admin/content/${args.contentId}`,
+          method: "PUT",
+
+          credentials: "omit",
+        };
+      },
+    }),
     mirrorPost: builder.mutation<any, { lensId: string; newLensId: string }>({
       query: (args) => {
-        console.log(args.lensId, args.newLensId);
+        // console.log(args.lensId, args.newLensId);
 
         return {
           url: `content/${args.lensId}/repost/${args.newLensId}`,
@@ -120,6 +130,18 @@ export const authApi = createApi({
         };
       },
     }),
+    bindAdminPost: builder.mutation<any, { contentId: string; lensId: string }>(
+      {
+        query: (args) => {
+          return {
+            url: `admin/bind/${args.contentId}/${args.lensId}`,
+            method: "PUT",
+
+            credentials: "omit",
+          };
+        },
+      }
+    ),
     removeContent: builder.mutation<any, { contentId: string }>({
       query: (args) => {
         return {
@@ -226,6 +248,8 @@ export const {
   useGetNonceQuery,
   useGetUnpublishedContentQuery,
   usePublishContentMutation,
+  usePublishAdminPostMutation,
+  useBindAdminPostMutation,
   useHasLanceProfileQuery,
   useGetFeedQuery,
   useBindWithLensIdMutation,

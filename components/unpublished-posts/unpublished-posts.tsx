@@ -1,93 +1,102 @@
+import loaderGif from "../../assets/gifs/ey0es.gif";
+
 import { useMutation } from "@apollo/client";
-import { useNavigation } from "@react-navigation/native";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
-import { ethers } from "ethers";
-import React, { useCallback } from "react";
-import { View, Text, RefreshControl, ScrollView } from "react-native";
+import React, { useCallback, useState } from "react";
+import { Text, RefreshControl, ScrollView, Image, View } from "react-native";
 import Colors from "../../constants/Colors";
-import { authApi } from "../../store/auth/auth.api";
+import { getLensPostId } from "../../contract/lens-hub.api";
+import {
+  authApi,
+  useBindWithLensIdMutation,
+  usePublishContentMutation,
+  useRemoveContentMutation,
+} from "../../store/auth/auth.api";
 import { CREATE_POST_TYPED_DATA } from "../../store/lens/add-post.mutation";
-import { signedTypeData } from "../../store/lens/post/create-post.utils";
 import { useAppDispatch } from "../../store/store.hook";
 import Post from "../post/post";
+import {
+  createLensPostIdParams,
+  createPostOptionsInfo,
+  getSignatureFromTypedData,
+  splitSignature,
+} from "./create-post.utils";
+import AppLoader from "../app-loader.component";
 
-const omitDeep = require("omit-deep");
-
-interface IUnpublishedPOsts {
+interface IUnpublishedPosts {
   postsData: any;
   isLoading: boolean;
   refetch(): void;
   profileId: number;
 }
 
-export default function UnpublishedPOsts(props: IUnpublishedPOsts) {
+export default function UnpublishedPOsts(props: IUnpublishedPosts) {
   const { postsData, isLoading, refetch, profileId } = props;
 
   const dispatch = useAppDispatch();
-  const navigation = useNavigation();
-  // const { account, library } = useEthers()
 
   const connector = useWalletConnect();
-  const [addPostToLens, data] = useMutation(CREATE_POST_TYPED_DATA);
+  const [publishContent] = usePublishContentMutation();
+  const [removeContent] = useRemoveContentMutation();
+  const [bindContentIdWithLens] = useBindWithLensIdMutation();
+  const [addPostToLens] = useMutation(CREATE_POST_TYPED_DATA);
 
-  const addPost = useCallback(async (id) => {
-    const contentMetadata = await dispatch(
-      authApi.endpoints.getContentMetadata.initiate({
-        contentId: id.toString(),
-      })
-    ).unwrap();
+  const [isTransactionLoading, setTransactionLoading] = useState(false);
 
-    const postOptionsInfo = {
-      variables: {
-        request: {
-          profileId: profileId,
-          contentURI: contentMetadata.data,
-          collectModule: {
-            revertCollectModule: true,
-          },
-          referenceModule: {
-            followerOnlyReferenceModule: false,
-          },
-        },
-      },
-    };
-    let typeD;
-    try {
-      typeD = await addPostToLens(postOptionsInfo);
-      // console.log("TYPED", typeD);
-    } catch (error) {
-      // navigation.navigate("Auth");
-      // console.error(error);
-      console.log(error);
+  const addPost = async (id: string | number) => {
+    if (id == null) {
+      return;
     }
-    const typedData = typeD?.data?.createPostTypedData?.typedData;
-    // ethers
+    try {
+      setTransactionLoading(true);
+      const contentMetadata = await dispatch(
+        authApi.endpoints.getContentMetadata.initiate({
+          contentId: id.toString(),
+        })
+      ).unwrap();
 
-    let signature;
+      const postOptionsInfo = createPostOptionsInfo(profileId, contentMetadata);
 
-    // console.log(typedData.domain);
-    // console.log(omitDeep(typedData.domain, "__typename"));
-    // try {
-    //   signature = await signedTypeData(
-    //     typedData.domain,
-    //     typedData.types,
-    //     typedData.value,
-    //     connector
-    //     // library?.getSigner()
-    //   );
-    //   // connector.signTypedData();
-    //   // signature = connector.signTypedData([
-    //   //   {
-    //   //     domain: typedData.domain,
-    //   //     types: typedData.types,
-    //   //     value: typedData.value,
-    //   //   },
-    //   // ]);
-    //   console.log("SIGNATURE", signature);
-    // } catch (error) {
-    //   console.log("SIGNATURE ERR", error);
-    // }
-  }, []);
+      const typeD = await addPostToLens(postOptionsInfo);
+      const typedData = typeD?.data?.createPostTypedData?.typedData;
+
+      const signature = await getSignatureFromTypedData(connector, typedData);
+      const signatureAfterSplit = splitSignature(signature);
+
+      const lensPostIdParams = createLensPostIdParams(
+        typedData,
+        signatureAfterSplit
+      );
+      const lensPostId = await getLensPostId(connector, lensPostIdParams);
+
+      await publishContent({ contentId: id.toString() });
+      await bindContentIdWithLens({
+        contentId: id.toString(),
+        lensId: lensPostId.toString(),
+      });
+
+      console.log("🥰 SUCCESS");
+    } catch (error) {
+      console.log("🤡 ERROR", error);
+    } finally {
+      setTransactionLoading(false);
+      refetch();
+    }
+  };
+
+  const declinePost = async (id: number) => {
+    if (id == null) {
+      return;
+    }
+    try {
+      await removeContent({ contentId: id.toString() });
+    } catch (error_) {
+      // toast.error(String(error_))
+    } finally {
+      refetch();
+      // setIsLoading(false)
+    }
+  };
   return (
     <ScrollView
       refreshControl={
@@ -98,16 +107,14 @@ export default function UnpublishedPOsts(props: IUnpublishedPOsts) {
         />
       }
     >
+      {isTransactionLoading && <AppLoader />}
       {postsData?.data.map((el) => (
         <Post
-          // isLoading={isLoading}
-          // setIsLoading={setIsLoading}
-
           key={el.id}
           isUnpublishedPost
           addPost={() => addPost(el.id)}
+          declinePost={() => declinePost(el.id)}
           data={{
-            // avatar: mockImg,
             from: el.fromAddress,
             to: el.toAddress,
             contractAddress: el.contractAddress,
