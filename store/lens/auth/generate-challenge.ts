@@ -8,14 +8,14 @@ const GET_CHALLENGE = `
 `;
 
 export const generateChallenge = (address: string) => {
-	console.log({ address });
+  // console.log({ address });
 
-	return client.query({
-		query: gql(GET_CHALLENGE),
-		variables: {
-			request: {
-				address,
-			},
-		},
-	});
+  return client.query({
+    query: gql(GET_CHALLENGE),
+    variables: {
+      request: {
+        address,
+      },
+    },
+  });
 };

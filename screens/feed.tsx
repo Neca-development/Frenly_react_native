@@ -33,7 +33,6 @@ function Feed({
     skip: 0,
   });
   const connector = useWalletConnect();
-
   const { value: myProfileId } = useGetWalletProfileId(
     connector.accounts[0] || ""
   );
@@ -65,6 +64,7 @@ function Feed({
   };
 
   const openProfile = (id: number) => {
+    // console.log(id);
     if (id == null) {
       return;
     }
@@ -80,7 +80,10 @@ function Feed({
           <Button onPress={logOut} title="Log out"></Button>
           <Button
             onPress={() =>
-              navigation.navigate("Profile", { id: Number(myProfileId) })
+              navigation.navigate("Profile", {
+                id: myProfileId,
+                currentUser: true,
+              })
             }
             title="Add post"
           ></Button>
@@ -115,7 +118,7 @@ function Feed({
 
             return (
               <Post
-                isAddCap={false}
+                isUnpublishedPost={false}
                 key={id}
                 openProfile={openProfile}
                 data={{

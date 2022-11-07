@@ -44,11 +44,6 @@ export default function Navigation({
         refresh: await AsyncStorageLib.getItem("lens_refresh_token"),
       };
 
-      console.log("tokens:", {
-        back,
-        lens,
-      });
-
       if (back.access && lens.access) {
         setUserAuth(true);
         return;
