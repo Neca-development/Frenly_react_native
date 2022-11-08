@@ -1,11 +1,11 @@
 {
   "expo": {
+    "sdkVersion": "44.0.0",
     "name": "frenly",
     "slug": "frenly",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icons/app_icon.png",
-    "sdkVersion": "44.0.0",
     "splash": {
       "image": "./assets/icons/splash.png",
       "resizeMode": "contain",
