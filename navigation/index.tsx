@@ -22,18 +22,22 @@ import LinkingConfiguration from "./LinkingConfiguration";
 
 import loader from "../assets/gifs/duck_loader.gif";
 import Profile from "../screens/profile";
+import { useWalletConnect } from "@walletconnect/react-native-dapp";
 
 export default function Navigation({
   colorScheme,
 }: {
   colorScheme: ColorSchemeName;
 }) {
+  const connector = useWalletConnect();
+
   const [isUserAuth, setUserAuth] = React.useState<Boolean | undefined>(
     undefined
   );
 
   React.useEffect(() => {
     (async () => {
+      // connector.killSession();
       const back = {
         access: await AsyncStorageLib.getItem("back_access_token"),
         refresh: await AsyncStorageLib.getItem("back_refresh_token"),

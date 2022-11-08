@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "frendly-367912",
+  "private_key_id": "b56df9c192b10cda9b630bde29055a15dfdf030a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCaoirBWkHcuYfi\nUzyo7Vj/JbcmSesY9Nd+GO90lW6vkJDTMcfecYwfOJlU20d28EdpeLGAr/fjc2zT\nOWdvYBfIRoXhRSbiyJxj28nExJQyEaRH3X2hsmdkT5qJkXiMDenTThQUjbC79+Ap\nc5fa059LsBMfyQ5uAUrMP5CEkljuoSG3Fy9QgadV+sUx1G7gk7yVJiZAD2h7h4CJ\nRbE5/k6oZC5QlTQ1wJmICMqld8DVXUam73ywYr2E82biYph5upQnMTgGQYirlyEz\nH9wB7dhkvtlBRrWp/xY+DtMDdvVXTG/U2l9k2fjGrS/LJbPwCqhaAwgqeIjfqCWB\nlCFn76MnAgMBAAECggEACP91uHGNko/zMb7BMV06SAKEUUSM2xNoNKyzxldprOqf\nGsLzS+TUj/6FoZPu6SNbLG56+a+Dn6cYRoQ5Ghh/2cYMxUp2VEzzGLZx27LKos02\n/32KcW3FqWceaXHfD1tB52tMLNP/3Dg0wYS56eBVjRxuSHO1FL6bgR4TxTsU1LHR\nY0W7ZY4z5GCjasLXZE3YIgC543Ppj+U7xHGMamZPeae1AW0ND0nqqe6lPg4H/ylr\nnRvI6H4oZrVPBYzOO0IvEiyywveVJPYLMJ3f+0qsOw9rQhr0yeWNZCZdmOjVNK2a\naNPk+nIrDh0j84Cilnvcnu3hdc193Bn3xvtKyFEv3QKBgQDVm5vcdEyaFMMoSKHV\nfPEbiAgOH71eTl2Sa1KLFHsWq0vHGEXdVmnDtYMmcVSZcFvOXl9tTHSrcCO7wItI\nwoS5g+eJA3DQKJuocy1iQ6zk2eM7qVdMhjq+I7+57fjpAVnz6EhmqXRJLYbFGfE7\n5PTQTQYjQJTH0a5Jne75/Hb0mwKBgQC5Ulo3nqR1GXDSSTWtSJDpOecWq8NA3d0O\nMXah52+O22rcjdz8Bdb9Tg3NgjmBM5Hy08NybAPCviHjIMdQyRKWtjvkiThLdMWO\nY3ARrjuc7d1OWFCwaHOZ4GRlKEKHnn5xsQFrmh/e5+n2PukTcOzA3xIl80HtL6/S\noPJnHmiGZQKBgE4E3QPDUqtAhBt1k+6HCQV2RQLrot4MH284VdjIrUCVZkMc4X+7\nbTv3UyS6Zhz5Bf81RwOD1mU7u0F7TSRRL+sWe332zMCq5Fe9YckvULnxv2ZuLp2b\ntV73bbK6cZyhSrqkj7U3lWqY/02EcTDgKm7egyxjDTSCqHbpAX07MjObAoGAfiMW\ncusQ5v808nyQA2zz7TrTFnQ8huc78dAq/hIntWWVO593fTaAWZMKBAoSF+XA/jWy\nvyvT93YwXIbQAyWI+Hn7FBdt8LX/TWZTPkWIH80rJ4snCJtfq6m2y792YRa426tt\n2w5hiPfzH/8751aiXri2gowrIESn+MZBl3x0Cp0CgYA891ovR8UVw6NCdVqvEhVo\nWM92pGkKSHZsN6yxqeQvAYQ6bf/y2y3rEZFaphgl2BYMVEKboMbhWbyRrg9PBs/F\nOzHjbaGbJ7SHu79Y3JYE+ZZPbY3rF64LUAXnTOXd7cbCFtem9+ANYRB7Asg/Asji\n8kTf/pwlfKnaHkbeDne9tQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "frenly@frendly-367912.iam.gserviceaccount.com",
+  "client_id": "118173732446892852422",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/frenly%40frendly-367912.iam.gserviceaccount.com"
+}

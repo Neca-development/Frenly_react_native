@@ -1,29 +1,38 @@
 {
-	"cli": {
-		"version": ">= 2.4.1"
-	},
-	"build": {
-		"development": {
-			"developmentClient": true,
-			"distribution": "internal"
-		},
-		"preview": {
-			"distribution": "internal",
-			"android": {
-				"buildType": "apk"
-			}
-		},
-		"preview2": {
-			"android": {
-				"gradleCommand": ":app:assembleRelease"
-			}
-		},
-		"preview3": {
-			"developmentClient": true
-		},
-		"production": {}
-	},
-	"submit": {
-		"production": {}
-	}
+  "cli": {
+    "version": ">= 0.48.1"
+  },
+  "build": {
+    "base": {
+      "node": "16.15.0"
+    },
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "production": {
+      "extends": "base",
+      "releaseChannel": "production",
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
 }
