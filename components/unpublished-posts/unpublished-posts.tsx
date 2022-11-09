@@ -3,7 +3,14 @@ import loaderGif from "../../assets/gifs/ey0es.gif";
 import { useMutation } from "@apollo/client";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import React, { useCallback, useState } from "react";
-import { Text, RefreshControl, ScrollView, Image, View } from "react-native";
+import {
+  Text,
+  RefreshControl,
+  ScrollView,
+  Image,
+  View,
+  Pressable,
+} from "react-native";
 import Colors from "../../constants/Colors";
 import { getLensPostId } from "../../contract/lens-hub.api";
 import {
@@ -22,6 +29,7 @@ import {
   splitSignature,
 } from "./create-post.utils";
 import AppLoader from "../app-loader.component";
+import { refreshAuth } from "../../store/lens/auth/refresh-token.mutation";
 
 interface IUnpublishedPosts {
   postsData: any;

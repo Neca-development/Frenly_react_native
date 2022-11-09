@@ -66,39 +66,23 @@ export default function Auth({ navigation }: RootTabScreenProps<"Auth">) {
     }
   };
 
-  // useEffect(() => {
-  //   console.log("🚀 ~ file: auth.tsx ~ line 75 ~ Auth ~ error", error);
-  // }, [error]);
-
   async function signIn() {
     let dataLogin;
-    // console.log("====================================");
-    // console.log(dataNonce);
-    // console.log("====================================");
     const nonce = dataNonce?.data?.nonce;
-    // console.log(nonce);
 
     if (nonce) {
-      // console.log(nonce);
       const signature = await connector.signPersonalMessage([
         `Nonce: ${nonce}`,
         connector.accounts[0].toLowerCase(),
       ]);
-
-      // console.log(
-      //   "🚀 ~ file: auth.tsx ~ line 80 ~ signIn ~ signature",
-      //   signature
-      // );
 
       dataLogin = await triggerLogin({
         address: connector.accounts[0],
         signature: signature || "",
       }).unwrap();
     }
-    // console.log(dataLogin);
     // @ts-ignore
     dispatch(setTokens({ ...dataLogin?.data }));
-    // console.log("AaA", connector.accounts[0], library);
 
     const provider = new ethers.providers.JsonRpcProvider(
       "https://polygon-mumbai.g.alchemy.com/v2/HCm-qNqCQm-NnbV9nHWxq9OnMHkUNvsg",
@@ -107,14 +91,7 @@ export default function Auth({ navigation }: RootTabScreenProps<"Auth">) {
     await login(connector.accounts[0], provider, connector);
 
     connector.accounts[0];
-    // console.log(
-    //   "🚀 ~ file: auth.tsx ~ line 96 ~ signIn ~ wallet",
-    //   connector.accounts[0]
-    // );
-    // console.log(
-    //   "🚀 ~ file: auth.tsx ~ line 89 ~ signIn ~ countProfile",
-    //   isLanceProfileExist
-    // );
+
     if (!isLanceProfileExist?.data?.data) {
       try {
         await createProfileHandler();
@@ -161,12 +138,15 @@ export default function Auth({ navigation }: RootTabScreenProps<"Auth">) {
       {!!connector.connected && (
         <>
           <Text>{shortenAddress(connector.accounts[0])}</Text>
-          <TouchableOpacity onPress={signIn} style={styles.buttonStyle}>
-            <Text style={styles.buttonTextStyle}>Sign in</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={killSession} style={styles.buttonStyle}>
-            <Text style={styles.buttonTextStyle}>Log out</Text>
-          </TouchableOpacity>
+          <View className="flex-row">
+            <TouchableOpacity onPress={killSession} style={styles.buttonStyle}>
+              <Text style={styles.buttonTextStyle}>Log out</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={signIn} style={styles.buttonStyle}>
+              <Text style={styles.buttonTextStyle}>Sign in</Text>
+            </TouchableOpacity>
+          </View>
         </>
       )}
     </View>

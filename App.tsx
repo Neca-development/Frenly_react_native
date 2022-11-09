@@ -17,6 +17,7 @@ import { Provider } from "react-redux";
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
+import { refreshAuth } from "./store/lens/auth/refresh-token.mutation";
 import { store } from "./store/store";
 
 const httpLink = new HttpLink({ uri: "https://api-mumbai.lens.dev" });
@@ -31,12 +32,19 @@ const authLink = setContext(async (req, { headers }) => {
     },
   };
 });
+
 const errorLink = onError(({ forward, operation, graphQLErrors }) => {
   console.log("graphQLErrors");
-  graphQLErrors?.forEach((error) => {
-    console.log(error);
+  graphQLErrors?.forEach(async (error) => {
+    // console.log(error);
     if (error.extensions.code == "UNAUTHENTICATED") {
-      window.location.pathname = "/auth";
+      console.log(error);
+      const token = await AsyncStorageLib.getItem("lens_refresh_token");
+      console.log("rToken", token);
+      const refreshTokens = await refreshAuth(token);
+      console.log("AccessToken", refreshTokens);
+      AsyncStorageLib.setItem("lens_access_token", refreshTokens.accessToken);
+      AsyncStorageLib.setItem("lens_refresh_token", refreshTokens.refreshToken);
     }
   });
   return forward(operation);
@@ -44,7 +52,7 @@ const errorLink = onError(({ forward, operation, graphQLErrors }) => {
 
 export const client = new ApolloClient({
   uri: "https://api-mumbai.lens.dev",
-  link: authLink.concat(httpLink),
+  link: authLink.concat(errorLink).concat(httpLink),
   //   link: from([errorLink, httpLink]),
   cache: new InMemoryCache(),
 });

@@ -112,13 +112,6 @@ function Post(props: IPostProps) {
 
   const [mirrorPost] = useMirrorPostMutation();
 
-  useEffect(() => {
-    console.log(
-      "🚀 ~ file: post.tsx ~ line 123 ~ useEffect ~ myProfileId",
-      myProfileId
-    );
-  }, [myProfileId]);
-
   const renderMessage = () => {
     let message;
     const messageTypeClone =
