@@ -53,7 +53,7 @@ function Feed({
 
   const refetchInfo = async () => {
     setFeedRefreshing(true);
-    refetchFeeds();
+    await refetchFeeds();
     await drafts.refetch();
     setFeedRefreshing(false);
   };
@@ -65,8 +65,7 @@ function Feed({
     navigation.navigate("Auth");
   };
 
-  const openProfile = (id: number) => {
-    // console.log(id);
+  const openProfile = (id: string) => {
     if (id == null) {
       return;
     }
@@ -83,7 +82,7 @@ function Feed({
           <Button
             onPress={() =>
               navigation.navigate("Profile", {
-                id: myProfileId,
+                id: myProfileId as string,
                 currentUser: true,
               })
             }

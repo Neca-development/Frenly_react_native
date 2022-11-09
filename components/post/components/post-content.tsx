@@ -1,5 +1,9 @@
 import React from "react";
-import { View, Text, Image, Pressable } from "react-native";
+
+import postPlaceholder from "../../../assets/images/post-placeholder.png";
+import { SERVER_URL } from "../../../constants/Api";
+
+import { View, Text, Image, Pressable, Linking } from "react-native";
 
 interface IPostContent {
   userName: string;

@@ -23,8 +23,8 @@ import PostContent from "./components/post-content";
 
 interface IPostProps {
   isUnpublishedPost: boolean;
-  addPost(id: number): void;
-  declinePost(id: number): void;
+  addPost(): void;
+  declinePost(): void;
   openProfile?(id: number): void;
   data: {
     avatar?: any;
@@ -106,23 +106,66 @@ function Post(props: IPostProps) {
     CREATE_MIRROR_TYPED_DATA
   );
 
-  const { data: publicationIsReact, refetch } = useQuery(GET_REACTIONS, {
-    variables: {
-      request: {
-        publicationIds: [id],
+  const { data: publicationIsReact, refetch: refetchLikes } = useQuery(
+    GET_REACTIONS,
+    {
+      variables: {
+        request: {
+          publicationIds: [data.id],
+        },
+        requestReaction: {
+          profileId: myProfileId,
+        },
       },
-      requestReaction: {
-        profileId: myProfileId,
-      },
-    },
-    skip: typeof id == "number",
-  });
-
+      skip: typeof id == "number",
+    }
+  );
   const [mirrorPost] = useMirrorPostMutation();
 
   function toggleCommentsCollapsed() {
     changeCommentsCollapsed(!isCommentsCollapsed);
   }
+
+  const likeHandler = async () => {
+    if (!myProfileId) {
+      return;
+    }
+    setIsLikeRequest(true);
+
+    try {
+      if (publicationIsReact.publications.items[0].reaction == null) {
+        await likePostToLens({
+          variables: {
+            request: {
+              profileId: myProfileId,
+              reaction: "UPVOTE",
+              publicationId: data.id,
+            },
+          },
+        });
+        console.log("💖 LIKE");
+      } else if (
+        publicationIsReact.publications.items[0].reaction == "UPVOTE"
+      ) {
+        await cancelLikePostToLens({
+          variables: {
+            request: {
+              profileId: myProfileId,
+              reaction: "UPVOTE",
+              publicationId: data.id,
+            },
+          },
+        });
+        console.log("💔 DISLIKE");
+      }
+    } catch (error) {
+      console.log("🤬", error);
+    } finally {
+      await refetchLikes();
+      await refetchPost();
+      setIsLikeRequest(false);
+    }
+  };
 
   return (
     <View className="flex-row items-start px-4 border-b border-border-color pt-2 pb-4">
@@ -184,6 +227,10 @@ function Post(props: IPostProps) {
           </Pressable>
           {!isUnpublishedPost && (
             <PostControls
+              isLiked={
+                publicationIsReact?.publications?.items[0]?.reaction == "UPVOTE"
+              }
+              onLikePress={likeHandler}
               onCommentsPress={toggleCommentsCollapsed}
               commentsCount={comments?.publications?.items?.length}
               likesCount={postData?.publication?.stats.totalUpvotes}
