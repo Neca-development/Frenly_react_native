@@ -202,6 +202,15 @@ export const authApi = createApi({
         };
       },
     }),
+    getFilteredFeed: builder.query<any, { take: number; skip: number }>({
+      query: (args) => {
+        return {
+          url: `content/filtered?take=${args.take}&skip=${args.skip}`,
+          method: "GET",
+          credentials: "omit",
+        };
+      },
+    }),
     uploadImage: builder.mutation<any, { avatar: File }>({
       query: (args) => {
         const formData = new FormData();
@@ -256,4 +265,5 @@ export const {
   useRemoveContentMutation,
   useMirrorPostMutation,
   useGetUserInfoQuery,
+  useGetFilteredFeedQuery,
 } = authApi;

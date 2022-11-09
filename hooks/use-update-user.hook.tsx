@@ -3,7 +3,7 @@ import {
   useGetUserInfoQuery,
   useUploadImageMutation,
   useUploadInfoMutation,
-} from "../../../store/auth/auth.api";
+} from "../store/auth/auth.api";
 
 export function useUpdate(address: string) {
   const {

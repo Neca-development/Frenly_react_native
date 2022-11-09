@@ -7,9 +7,6 @@ import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import { id } from "ethers/lib/utils";
 import Collapsible from "react-native-collapsible";
 import imagePlaceholder from "../../assets/images/temp-avatar.png";
-import commentIcon from "../../assets/icons/comment.png";
-import cycleIcon from "../../assets/icons/cycle.png";
-import heartIcon from "../../assets/icons/heart.png";
 import { useGetWalletProfileId } from "../../contract/lens-hub.api";
 import { useMirrorPostMutation } from "../../store/auth/auth.api";
 import { GET_PUBLICATIONS } from "../../store/lens/get-publication.query";
@@ -20,6 +17,9 @@ import { GET_POST_QUERY } from "../../store/lens/post/get-post.query";
 import { GET_REACTIONS } from "../../store/lens/post/get-reaction.query";
 import Comments from "../Comments";
 import { SERVER_URL } from "../../constants/Api";
+import { useUpdate } from "../../hooks/use-update-user.hook";
+import PostControls from "./components/post-controlls";
+import PostContent from "./components/post-content";
 
 interface IPostProps {
   isUnpublishedPost: boolean;
@@ -50,6 +50,7 @@ interface IPostProps {
     txHash: string;
     isMirror: boolean;
     handleMirror?: string;
+    creator: string;
   };
 }
 
@@ -69,6 +70,13 @@ function Post(props: IPostProps) {
     connector.accounts[0] || ""
   );
 
+  const {
+    name: username,
+    description,
+    avatar,
+    uploadImage,
+    isLoading: creatorLoading,
+  } = useUpdate(data.creator);
   const [isLoading, setIsLoading] = useState(false);
   const [likePostToLens, dataLikes] = useMutation(LIKE_TO_POST);
   const [cancelLikePostToLens, dataCancelLikes] =
@@ -112,41 +120,6 @@ function Post(props: IPostProps) {
 
   const [mirrorPost] = useMirrorPostMutation();
 
-  const renderMessage = () => {
-    let message;
-    const messageTypeClone =
-      data.from == "0x0000000000000000000000000000000000000000"
-        ? "MINTED"
-        : data.messageType;
-
-    switch (messageTypeClone) {
-      case "MINTED":
-        message = "🎉 Minted a new ";
-        break;
-      case "RECEIVE":
-        message = "📤 Received ";
-        break;
-      case "SEND":
-        message = "📤 Sent ";
-        break;
-      default:
-        break;
-    }
-
-    switch (data.itemType) {
-      case "nft":
-        message += `${data.messageType !== "MINTED" ? "an" : ""} NFT`;
-        break;
-      case "token":
-        message += "tokens";
-        break;
-      default:
-        break;
-    }
-
-    return `${message} `;
-  };
-
   function toggleCommentsCollapsed() {
     changeCommentsCollapsed(!isCommentsCollapsed);
   }
@@ -158,84 +131,23 @@ function Post(props: IPostProps) {
           onPress={() => openProfile(data.profileId)}
           className="mr-4 items-center border rounded-full border-border-color overflow-hidden"
         >
-          <Image
-            source={data.avatar || imagePlaceholder}
-            className="w-[40px] h-[40px]"
-          />
-        </Pressable>
-      )}
-      <View className="flex-1">
-        <View>
-          <Text className="text-base font-semibold">{data.name}</Text>
-          <Text className="text-base font-normal text-gray">{data.date}</Text>
-        </View>
-
-        <View>
-          <Text className="text-base font-semibold">
-            {renderMessage()}{" "}
-            {data.from !== "0x0000000000000000000000000000000000000000" ? (
-              data.messageType == "RECEIVE" ? (
-                <>from&nbsp;</>
-              ) : (
-                <>to&nbsp;</>
-              )
-            ) : (
-              <>from Smart contract&nbsp;</>
-            )}
-          </Text>
-          <Text
-            onPress={() =>
-              Linking.openURL(
-                data.blockchainType === "ETHEREUM"
-                  ? `https://rinkeby.etherscan.io/address/${
-                      data.from == "0x0000000000000000000000000000000000000000"
-                        ? data.contractAddress
-                        : data.from
-                    }`
-                  : `https://polygonscan.com/address/${
-                      data.from == "0x0000000000000000000000000000000000000000"
-                        ? data.contractAddress
-                        : data.from
-                    }`
-              )
-            }
-            className="text-main text-base font-semibold"
-            rel="noreferrer"
-          >
-            {data.from == "0x0000000000000000000000000000000000000000"
-              ? data.contractAddress
-              : data.messageType == "RECEIVE"
-              ? data.from
-              : data.to}
-          </Text>
-        </View>
-
-        <Text className="text-sm font-normal text-gray-darker mt-1">
-          {data.info}
-        </Text>
-
-        <View className="relative h-[300px] rounded-lg overflow-hidden mt-1">
-          {data.image !== null ? (
+          {avatar ? (
             <Image
               source={{
-                uri: `${SERVER_URL}token-images/${data.image}`,
+                uri: `${SERVER_URL}avatars/${avatar}`,
               }}
-              resizeMode="cover"
-              className="w-full h-full object-center"
+              className="w-[40px] h-[40px] rounded-full"
             />
           ) : (
             <Image
-              source={"../../assets/images/favicon.png"}
-              // className="m-auto mt-30 mb-30"
+              source={data.avatar || imagePlaceholder}
+              className="w-[40px] h-[40px] rounded-full"
             />
           )}
-
-          {/* <img
-            src={ '/assets/images/eyes.gif'}s
-            alt="image"
-            className="object-cover"
-          /> */}
-        </View>
+        </Pressable>
+      )}
+      <View className="flex-1">
+        <PostContent userName={username || data.name} data={data} />
         {isUnpublishedPost && (
           <View className="flex-row mt-2">
             <Button
@@ -256,7 +168,7 @@ function Post(props: IPostProps) {
         )}
 
         <View className="flex-row justify-between items-center mt-2">
-          <Text
+          <Pressable
             onPress={() =>
               Linking.openURL(
                 data.blockchainType == "ETHEREUM"
@@ -264,57 +176,19 @@ function Post(props: IPostProps) {
                   : `https://mumbai.polygonscan.com/tx/${data.txHash}`
               )
             }
-            className="text-sm text-main"
-            rel="noreferrer"
           >
-            Check on{" "}
-            {data.blockchainType === "ETHEREUM" ? "Etherscan" : "Polygonscan"}
-          </Text>
-          {isUnpublishedPost === false && (
-            <View className="flex-row items-center">
-              <Pressable
-                // disabled={isLikeRequest}
-                // onClick={likeHandler}
-                className={`flex-row items-center justify-center py-1 px-2 ${
-                  isLikeRequest ? "bg-gray" : ""
-                }`}
-              >
-                <Image
-                  source={heartIcon}
-                  className="h-5 w-5"
-                  resizeMode="contain"
-                />
-                <Text className="text-md font-semibold text-gray-darker ml-1">
-                  {postData?.publication?.stats.totalUpvotes}
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={toggleCommentsCollapsed}
-                className="flex-row items-center justify-center py-1 px-2"
-              >
-                <Image
-                  source={commentIcon}
-                  className="h-5 w-5"
-                  resizeMode="contain"
-                />
-                <Text className="text-md font-semibold text-gray-darker ml-1">
-                  {comments?.publications?.items?.length ?? 0}
-                </Text>
-              </Pressable>
-              <Pressable
-                // onClick={mirrorHandler}
-                className="flex-row items-center justify-center py-1 px-2"
-              >
-                <Image
-                  source={cycleIcon}
-                  className="h-5 w-5"
-                  resizeMode="contain"
-                />
-                <Text className="text-md font-semibold text-gray-darker ml-1">
-                  {/* {totalMirror} */}0
-                </Text>
-              </Pressable>
-            </View>
+            <Text className="text-sm text-main" rel="noreferrer">
+              Check on{" "}
+              {data.blockchainType === "ETHEREUM" ? "Etherscan" : "Polygonscan"}
+            </Text>
+          </Pressable>
+          {!isUnpublishedPost && (
+            <PostControls
+              onCommentsPress={toggleCommentsCollapsed}
+              commentsCount={comments?.publications?.items?.length}
+              likesCount={postData?.publication?.stats.totalUpvotes}
+              isLikeRequest={isLikeRequest}
+            />
           )}
         </View>
         {!isUnpublishedPost && (
