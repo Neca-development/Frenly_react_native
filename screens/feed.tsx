@@ -12,9 +12,11 @@ import Button from "../components/Button";
 import Post from "../components/post/post";
 
 import { useQuery } from "@apollo/client";
-import mockImg from "../assets/images/wolf.jpeg";
 import safeViewAndroid from "../helpers/safe-view-android";
-import { useGetFeedQuery } from "../store/auth/auth.api";
+import {
+  useGetFeedQuery,
+  useGetFilteredFeedQuery,
+} from "../store/auth/auth.api";
 import { GET_PUBLICATIONS } from "../store/lens/get-publication.query";
 
 import loader from "../assets/gifs/duck_loader.gif";
@@ -28,8 +30,8 @@ import { useGetWalletProfileId } from "../contract/lens-hub.api";
 function Feed({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "Feed">) {
-  const { data: dataFeeds, refetch: refetchFeeds } = useGetFeedQuery({
-    take: 10,
+  const { data: dataFeeds, refetch: refetchFeeds } = useGetFilteredFeedQuery({
+    take: 40,
     skip: 0,
   });
   const connector = useWalletConnect();
@@ -98,7 +100,7 @@ function Feed({
         }
       >
         {dataFeeds ? (
-          drafts?.data?.publications?.items.map((el: any) => {
+          dataFeeds?.data?.map((el: any) => {
             const {
               createdAt,
               collectModule,
@@ -107,47 +109,54 @@ function Feed({
               id,
               stats,
               mirrorOf,
+              lensId,
             } = el;
 
             let index;
-            dataFeeds?.data?.forEach((element: any, _index: number) => {
-              if (element.lensId == id) {
-                index = _index;
+            drafts?.data?.publications?.items?.forEach(
+              (element: any, _index: number) => {
+                if (element.id === lensId) {
+                  index = _index;
+                }
               }
-            });
-
-            return (
-              <Post
-                isUnpublishedPost={false}
-                key={id}
-                openProfile={openProfile}
-                data={{
-                  avatar: mockImg,
-                  from: metadata?.attributes[4].value,
-                  to: metadata?.attributes[3].value,
-                  contractAddress: metadata?.attributes[1].value,
-                  info: metadata.description,
-                  image: dataFeeds?.data[Number(index)]?.image,
-                  name: profile.handle,
-                  date: createdAt,
-                  showDate: false,
-                  messageType: metadata.attributes[5].value,
-                  itemType: "nft",
-                  totalUpvotes: stats.totalUpvotes,
-                  totalMirror: stats.totalAmountOfMirrors,
-                  id: id,
-                  profileId: profile.id,
-                  refetchInfo: refetchInfo,
-                  txHash: metadata.attributes[8].value,
-                  blockchainType: metadata.attributes[7].value,
-                  isMirror: dataFeeds?.data[Number(index)]?.isMirror,
-                  handleMirror: mirrorOf?.profile.handle,
-                }}
-              ></Post>
             );
+            if (drafts?.data?.publications?.items[Number(index)]) {
+              const { createdAt, profile, metadata, id, stats, mirrorOf } =
+                drafts?.data?.publications?.items[Number(index)];
+
+              return (
+                <Post
+                  isUnpublishedPost={false}
+                  key={id}
+                  openProfile={openProfile}
+                  data={{
+                    from: metadata?.attributes[4].value,
+                    to: metadata?.attributes[3].value,
+                    contractAddress: metadata?.attributes[1].value,
+                    info: metadata?.description,
+                    image: metadata?.attributes[9]?.value,
+                    name: profile?.handle,
+                    date: createdAt,
+                    showDate: false,
+                    messageType: metadata?.attributes[5].value,
+                    itemType: "nft",
+                    totalUpvotes: stats?.totalUpvotes,
+                    totalMirror: stats?.totalAmountOfMirrors,
+                    id: id,
+                    profileId: profile?.id,
+                    refetchInfo: refetchInfo,
+                    txHash: metadata?.attributes[8].value,
+                    blockchainType: metadata?.attributes[7].value,
+                    isMirror: dataFeeds?.data[Number(index)]?.isMirror,
+                    handleMirror: mirrorOf?.profile.handle,
+                    creator: profile.ownedBy,
+                  }}
+                ></Post>
+              );
+            }
           })
         ) : (
-          <Image source={loader} />
+          <Image source={loader} resizeMode="cover" className="w-full mt-2" />
         )}
       </ScrollView>
     </SafeAreaView>

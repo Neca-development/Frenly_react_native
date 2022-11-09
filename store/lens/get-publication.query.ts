@@ -1,11 +1,11 @@
-import { gql } from '@apollo/client'
-import { original } from '@reduxjs/toolkit'
-import { id } from 'ethers/lib/utils'
-import next from 'next'
-import { profile } from 'node:console'
-import { on } from 'node:events'
-import { request } from 'node:http'
-import { url } from 'node:inspector'
+import { gql } from "@apollo/client";
+import { original } from "@reduxjs/toolkit";
+import { id } from "ethers/lib/utils";
+import next from "next";
+import { profile } from "node:console";
+import { on } from "node:events";
+import { request } from "node:http";
+import { url } from "node:inspector";
 
 export const GET_PUBLICATIONS = gql`
   query ($request: PublicationsQueryRequest!) {
@@ -307,7 +307,7 @@ export const GET_PUBLICATIONS = gql`
   fragment CommentMirrorOfFields on Comment {
     ...CommentBaseFields
   }
-`
+`;
 
 export const GET_COMMENTS = gql`
   query (
@@ -620,4 +620,4 @@ export const GET_COMMENTS = gql`
     appId
     __typename
   }
-`
+`;

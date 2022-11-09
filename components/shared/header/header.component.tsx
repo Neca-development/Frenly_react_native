@@ -13,7 +13,7 @@ import Button from "../../Button";
 import tempAvatar from "../../../assets/images/temp-avatar.png";
 
 import Loader from "../loader/loader.component";
-import { useUpdate } from "./use-update-user.hook";
+import { useUpdate } from "../../../hooks/use-update-user.hook";
 
 export interface IHeaderProperties {
   title: string;
