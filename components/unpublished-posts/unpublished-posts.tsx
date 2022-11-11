@@ -29,7 +29,7 @@ import {
   splitSignature,
 } from "./create-post.utils";
 import AppLoader from "../app-loader.component";
-import { refreshAuth } from "../../store/lens/auth/refresh-token.mutation";
+import Toast from "react-native-toast-message";
 
 interface IUnpublishedPosts {
   postsData: any;
@@ -83,12 +83,22 @@ export default function UnpublishedPOsts(props: IUnpublishedPosts) {
         lensId: lensPostId.toString(),
       });
 
+      refetch();
       console.log("🥰 SUCCESS");
+      Toast.show({
+        type: "success",
+        text1: "✅ Success",
+        text2: "Your post created",
+      });
     } catch (error) {
       console.log("🤡 ERROR", error);
+      Toast.show({
+        type: "error",
+        text1: "❌ Error",
+        text2: "Try again later",
+      });
     } finally {
       setTransactionLoading(false);
-      refetch();
     }
   };
 

@@ -4,14 +4,17 @@ import postPlaceholder from "../../../assets/images/post-placeholder.png";
 import { SERVER_URL } from "../../../constants/Api";
 
 import { View, Text, Image, Pressable, Linking } from "react-native";
+import { IPostData } from "../post";
+import { useUpdate } from "../../../hooks/use-update-user.hook";
 
 interface IPostContent {
   userName: string;
-  data: any;
+  data: IPostData;
 }
 
 export default function PostContent(props: IPostContent) {
   const { userName, data } = props;
+  const { name: mirrorFrom } = useUpdate(data.handleMirror || "");
 
   const renderMessage = () => {
     let message;
@@ -51,6 +54,14 @@ export default function PostContent(props: IPostContent) {
     <>
       <View>
         <Text className="text-base font-semibold">{userName}</Text>
+        {data.isMirror ? (
+          <View className="flex-row">
+            <Text>🌀 mirrored from </Text>
+            <Text className="font-bold">
+              {mirrorFrom ? mirrorFrom : data.handleMirror}
+            </Text>
+          </View>
+        ) : null}
         <Text className="text-base font-normal text-gray">{data.date}</Text>
       </View>
 

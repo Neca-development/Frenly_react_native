@@ -44,8 +44,8 @@ function Comments(props: ICommentsProps) {
       {data?.publications?.items?.map((comment: IComment) => (
         <Comment key={comment.id} {...comment} />
       ))}
-      <View className="w-full pt-4 pb-4 flex-row">
-        <View className="flex rounded-2xl bg-light-gray px-4 py-2 w-full mr-2">
+      <View className="w-full pt-4 pb-4 flex-row items-center">
+        <View className="flex-1 rounded-2xl bg-light-gray px-4 py-2  mr-2">
           <TextInput
             value={commentValue}
             onChange={(e) => setCommentValue(e.target.value)}

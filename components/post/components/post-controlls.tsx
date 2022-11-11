@@ -9,8 +9,10 @@ import { View, Text, Pressable, Image, ActivityIndicator } from "react-native";
 interface IPostControls {
   onCommentsPress(): void;
   onLikePress(): void;
+  onMirrorPress(): void;
   commentsCount: number;
   likesCount: number;
+  mirrorsCount: number;
   isLikeRequest: boolean;
   isLiked: boolean;
 }
@@ -19,7 +21,9 @@ export default function PostControls(props: IPostControls) {
   const {
     commentsCount,
     onCommentsPress,
+    onMirrorPress,
     likesCount,
+    mirrorsCount,
     isLiked,
     isLikeRequest,
     onLikePress,
@@ -54,12 +58,12 @@ export default function PostControls(props: IPostControls) {
         </Text>
       </Pressable>
       <Pressable
-        // onClick={mirrorHandler}
+        onPress={onMirrorPress}
         className="flex-row items-center justify-center py-1 px-2"
       >
         <Image source={cycleIcon} className="h-5 w-5" resizeMode="contain" />
         <Text className="text-md font-semibold text-neutral-400 ml-1">
-          {/* {totalMirror} */}0
+          {mirrorsCount ?? 0}
         </Text>
       </Pressable>
     </View>

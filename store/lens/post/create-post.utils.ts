@@ -13,7 +13,7 @@ export const signedTypeData = async (
   signer: any
 ) => {
   const typesWithoutTypeName = omitDeep(types, "__typename");
-  const parasha = {
+  const data = {
     types: {
       EIP712Domain: [
         {
@@ -40,7 +40,7 @@ export const signedTypeData = async (
   };
   return signer.signTypedData([
     signer.accounts[0],
-    JSON.stringify({ primaryType: "Mail", ...parasha }),
+    JSON.stringify({ primaryType: "Mail", ...data }),
   ]);
 };
 

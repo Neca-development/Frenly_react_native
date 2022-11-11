@@ -108,6 +108,7 @@ function Feed({
               id,
               stats,
               mirrorOf,
+              isMirror,
               lensId,
             } = el;
 
@@ -146,8 +147,8 @@ function Feed({
                     refetchInfo: refetchInfo,
                     txHash: metadata?.attributes[8].value,
                     blockchainType: metadata?.attributes[7].value,
-                    isMirror: dataFeeds?.data[Number(index)]?.isMirror,
-                    handleMirror: mirrorOf?.profile.handle,
+                    isMirror: isMirror,
+                    handleMirror: mirrorOf?.profile.ownedBy,
                     creator: profile.ownedBy,
                   }}
                 ></Post>

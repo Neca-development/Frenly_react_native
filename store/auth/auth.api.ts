@@ -105,14 +105,17 @@ export const authApi = createApi({
         };
       },
     }),
-    mirrorPost: builder.mutation<any, { lensId: string; newLensId: string }>({
-      query: (args) => {
-        // console.log(args.lensId, args.newLensId);
-
+    mirrorPost: builder.mutation<
+      any,
+      { lensId: string; newLensId: string; description: string }
+    >({
+      query: ({ lensId, newLensId, description }) => {
         return {
-          url: `content/${args.lensId}/repost/${args.newLensId}`,
+          url: `content/${lensId}/repost/${newLensId}`,
           method: "POST",
-
+          body: {
+            description,
+          },
           credentials: "omit",
         };
       },
