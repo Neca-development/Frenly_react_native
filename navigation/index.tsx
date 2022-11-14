@@ -20,9 +20,9 @@ import NotFoundScreen from "../screens/NotFoundScreen";
 import { RootStackParamList } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 
-import loader from "../assets/gifs/duck_loader.gif";
 import Profile from "../screens/profile";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
+import AppLoader from "../components/app-loader.component";
 
 export default function Navigation({
   colorScheme,
@@ -64,15 +64,7 @@ export default function Navigation({
       {isUserAuth !== undefined ? (
         <RootNavigator initialRoute={isUserAuth ? "Feed" : "Auth"} />
       ) : (
-        <View
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Image source={loader} />
-        </View>
+        <AppLoader />
       )}
     </NavigationContainer>
   );

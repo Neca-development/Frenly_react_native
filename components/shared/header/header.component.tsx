@@ -1,4 +1,5 @@
 /* eslint-disable sonarjs/cognitive-complexity */
+import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 // import { useEthers } from "@usedapp/core";
 import { useEffect, useState } from "react";
@@ -14,6 +15,10 @@ import tempAvatar from "../../../assets/images/temp-avatar.png";
 
 import Loader from "../loader/loader.component";
 import { useUpdate } from "../../../hooks/use-update-user.hook";
+import BackIcon from "../../../assets/icons/back-icon";
+import { useAppDispatch } from "../../../store/store.hook";
+import { logout } from "../../../store/auth/auth.slice";
+import { useWalletConnect } from "@walletconnect/react-native-dapp";
 
 export interface IHeaderProperties {
   title: string;
@@ -55,6 +60,8 @@ export default function Header(props: IHeaderProperties) {
   const [isEdit, setIsEdit] = useState(false);
 
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
+  const connector = useWalletConnect();
   // const [isDescEdit, setIsDescEdit] = useState(false)
   const {
     userInfo,
@@ -77,6 +84,17 @@ export default function Header(props: IHeaderProperties) {
   );
   const [fileImage, setFileImage] = useState();
   const [isLoading, setIsLoading] = useState(false);
+
+  const logOut = async () => {
+    await dispatch(logout());
+    await connector.killSession();
+
+    await AsyncStorageLib.removeItem("lens_access_token");
+    await AsyncStorageLib.removeItem("lens_refresh_token");
+
+    navigation.navigate("Auth");
+  };
+
   useEffect(() => {
     setNameValue(name == null ? nickname : name);
     setDescValue(description === null ? address : description);
@@ -95,8 +113,8 @@ export default function Header(props: IHeaderProperties) {
             <ArrowBack />
           </Pressable>
           <Text className="text-xl font-bold ">{nameValue}</Text>
-          <Pressable>
-            <Share />
+          <Pressable onPress={logOut}>
+            <BackIcon />
           </Pressable>
         </View>
       </View>
