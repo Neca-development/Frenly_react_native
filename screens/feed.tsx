@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import {
   Image,
+  Pressable,
   RefreshControl,
   SafeAreaView,
   ScrollView,
   Text,
   View,
 } from "react-native";
-import EyesIcon from "../assets/icons/eyes";
+import EyesIcon from "../assets/icons/eyes.tsx";
 import Button from "../components/Button";
 import Post from "../components/post/post";
+import tempAvatar from "../assets/images/temp-avatar.png";
 
 import { useQuery } from "@apollo/client";
 import safeViewAndroid from "../helpers/safe-view-android";
@@ -19,13 +21,15 @@ import {
 } from "../store/auth/auth.api";
 import { GET_PUBLICATIONS } from "../store/lens/get-publication.query";
 
-import loader from "../assets/gifs/duck_loader.gif";
-import { logout } from "../store/auth/auth.slice";
 import { useAppDispatch } from "../store/store.hook";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useGetWalletProfileId } from "../contract/lens-hub.api";
+import { GET_DEFAULT_PROFILES } from "../store/lens/get-profile.query";
+import { useUpdate } from "../hooks/use-update-user.hook";
+import { SERVER_URL } from "../constants/Api";
+import AppLoader from "../components/app-loader.component";
 
 function Feed({
   navigation,
@@ -47,6 +51,27 @@ function Feed({
       },
     },
   });
+  const { data: dataProfile, refetch: refetchProfile } = useQuery(
+    GET_DEFAULT_PROFILES,
+    {
+      variables: {
+        request: {
+          profileId: myProfileId,
+        },
+      },
+    }
+  );
+
+  const {
+    userInfo,
+    updateUserInfo,
+    refetchUserInfo,
+    name,
+    description,
+    avatar,
+    uploadImage,
+  } = useUpdate(connector.accounts[0] || "");
+
   const [isFeedRefreshing, setFeedRefreshing] = useState(false);
 
   const dispatch = useAppDispatch();
@@ -56,13 +81,6 @@ function Feed({
     await refetchFeeds();
     await drafts.refetch();
     setFeedRefreshing(false);
-  };
-
-  const logOut = async () => {
-    await dispatch(logout());
-    await connector.killSession();
-
-    navigation.navigate("Auth");
   };
 
   const openProfile = (id: string) => {
@@ -76,18 +94,34 @@ function Feed({
     <SafeAreaView style={safeViewAndroid.AndroidSafeArea}>
       <View className="w-full pt-4 px-4 border-b border-border-color pb-3">
         <View className="flex-row justify-between items-center">
-          <EyesIcon />
-          <Text className="text-xl font-bold ">frenly feed</Text>
-          <Button onPress={logOut} title="Log out"></Button>
-          <Button
+          <View className="flex-row items-center">
+            <View className="mr-4 w-[40px] h-[38px] items-center justify-center">
+              <EyesIcon />
+            </View>
+            <Text className="text-xl font-bold">frenly feed</Text>
+          </View>
+          <Pressable
             onPress={() =>
               navigation.navigate("Profile", {
                 id: myProfileId as string,
                 currentUser: true,
               })
             }
-            title="Add post"
-          ></Button>
+          >
+            {avatar && avatar !== null ? (
+              <Image
+                source={{
+                  uri: `${SERVER_URL}avatars/${avatar}`,
+                }}
+                className="w-[32px] h-[32px]  rounded-full "
+              />
+            ) : (
+              <Image
+                source={tempAvatar}
+                className="w-[32px] h-[32px]  rounded-full "
+              />
+            )}
+          </Pressable>
         </View>
       </View>
       <ScrollView
@@ -100,18 +134,7 @@ function Feed({
       >
         {dataFeeds ? (
           dataFeeds?.data?.map((el: any) => {
-            const {
-              createdAt,
-              collectModule,
-              profile,
-              metadata,
-              id,
-              stats,
-              mirrorOf,
-              isMirror,
-              lensId,
-              mirrorDescription,
-            } = el;
+            const { isMirror, lensId, mirrorDescription } = el;
 
             let index;
             drafts?.data?.publications?.items?.forEach(
@@ -158,7 +181,7 @@ function Feed({
             }
           })
         ) : (
-          <Image source={loader} resizeMode="cover" className="w-full mt-2" />
+          <AppLoader />
         )}
       </ScrollView>
     </SafeAreaView>

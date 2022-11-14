@@ -1,5 +1,3 @@
-import loaderGif from "../../assets/gifs/ey0es.gif";
-
 import { useMutation } from "@apollo/client";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import React, { useCallback, useState } from "react";
