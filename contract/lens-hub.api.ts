@@ -12,7 +12,17 @@ const provider = new ethers.providers.JsonRpcProvider(
 );
 const lensContract = new Contract(lensHubContract, lensHubABI, provider);
 
-export async function getLensPostId(connector: any, obj: any) {
+function createLensPostId(receipt: any) {
+  return Number(receipt?.logs[0]?.topics[2]).toString(16).length === 1
+    ? `0x${Number(receipt?.logs[0]?.topics[1]).toString(16)}-0x0${Number(
+        receipt?.logs[0]?.topics[2]
+      ).toString(16)}`
+    : `0x${Number(receipt?.logs[0]?.topics[1]).toString(16)}-0x${Number(
+        receipt?.logs[0]?.topics[2]
+      ).toString(16)}`;
+}
+
+async function getContractWithSigner(connector: any): Promise<Contract> {
   const provider = new WalletConnectProvider({
     rpc: {
       80001:
@@ -26,18 +36,36 @@ export async function getLensPostId(connector: any, obj: any) {
   const ethers_provider = new ethers.providers.Web3Provider(provider);
   const signer = ethers_provider.getSigner();
 
-  const lensContractInst = new Contract(lensHubContract, lensHubABI, signer);
+  return new Contract(lensHubContract, lensHubABI, signer);
+}
+
+export async function getLensCommentId(connector: any, obj: any) {
+  const lensContractInst = await getContractWithSigner(connector);
+  const res = await lensContractInst.commentWithSig(obj);
+  const receipt = await res.wait();
+
+  const lensPostId = createLensPostId(receipt);
+
+  return lensPostId;
+}
+
+export async function getMirrorPostId(connector: any, obj: any) {
+  const lensContractInst = await getContractWithSigner(connector);
+  const res = await lensContractInst.mirrorWithSig(obj);
+  const receipt = await res.wait();
+
+  const lensPostId = createLensPostId(receipt);
+
+  return lensPostId;
+}
+
+export async function getLensPostId(connector: any, obj: any) {
+  const lensContractInst = await getContractWithSigner(connector);
+
   const res = await lensContractInst.postWithSig(obj);
   const receipt = await res.wait();
 
-  const lensPostId =
-    Number(receipt?.logs[0]?.topics[2]).toString(16).length === 1
-      ? `0x${Number(receipt?.logs[0]?.topics[1]).toString(16)}-0x0${Number(
-          receipt?.logs[0]?.topics[2]
-        ).toString(16)}`
-      : `0x${Number(receipt?.logs[0]?.topics[1]).toString(16)}-0x${Number(
-          receipt?.logs[0]?.topics[2]
-        ).toString(16)}`;
+  const lensPostId = createLensPostId(receipt);
 
   return lensPostId;
 }

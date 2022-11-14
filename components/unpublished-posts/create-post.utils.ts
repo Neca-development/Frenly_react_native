@@ -2,6 +2,51 @@ import ethers, { utils } from "ethers";
 
 const omitDeep = require("omit-deep");
 
+export const createLensCommentIdParams = (
+  typedData: any,
+  signatureAfterSplit: ethers.Signature
+) => {
+  const { v, r, s } = signatureAfterSplit;
+  return {
+    profileId: typedData.value.profileId,
+    contentURI: typedData.value.contentURI,
+    profileIdPointed: typedData.value.profileIdPointed,
+    pubIdPointed: typedData.value.pubIdPointed,
+    referenceModuleData: typedData.value.referenceModuleData,
+    collectModule: typedData.value.collectModule,
+    collectModuleInitData: typedData.value.collectModuleInitData,
+    referenceModule: typedData.value.referenceModule,
+    referenceModuleInitData: typedData.value.referenceModuleInitData,
+    sig: {
+      v,
+      r,
+      s,
+      deadline: typedData.value.deadline,
+    },
+  };
+};
+
+export const createLensMirrorIdParams = (
+  typedData: any,
+  signatureAfterSplit: ethers.Signature
+) => {
+  const { v, r, s } = signatureAfterSplit;
+  return {
+    profileId: typedData.value.profileId,
+    profileIdPointed: typedData.value.profileIdPointed,
+    pubIdPointed: typedData.value.pubIdPointed,
+    referenceModuleData: typedData.value.referenceModuleData,
+    referenceModule: typedData.value.referenceModule,
+    referenceModuleInitData: typedData.value.referenceModuleInitData,
+    sig: {
+      v,
+      r,
+      s,
+      deadline: typedData.value.deadline,
+    },
+  };
+};
+
 export const createLensPostIdParams = (
   typedData: any,
   signatureAfterSplit: ethers.Signature

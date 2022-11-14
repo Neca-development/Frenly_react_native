@@ -17,6 +17,7 @@ import { Provider } from "react-redux";
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
+import Toast from "react-native-toast-message";
 import { refreshAuth } from "./store/lens/auth/refresh-token.mutation";
 import { store } from "./store/store";
 
@@ -38,13 +39,15 @@ const errorLink = onError(({ forward, operation, graphQLErrors }) => {
   graphQLErrors?.forEach(async (error) => {
     // console.log(error);
     if (error.extensions.code == "UNAUTHENTICATED") {
-      console.log(error);
       const token = await AsyncStorageLib.getItem("lens_refresh_token");
-      console.log("rToken", token);
       const refreshTokens = await refreshAuth(token);
-      console.log("AccessToken", refreshTokens);
       AsyncStorageLib.setItem("lens_access_token", refreshTokens.accessToken);
       AsyncStorageLib.setItem("lens_refresh_token", refreshTokens.refreshToken);
+      Toast.show({
+        type: "success",
+        text1: "🔄 Authorization updated",
+        text2: "Repeat your action again",
+      });
     }
   });
   return forward(operation);
@@ -70,6 +73,7 @@ export default function App() {
           <SafeAreaProvider>
             <Navigation colorScheme={colorScheme} />
             <StatusBar />
+            <Toast />
           </SafeAreaProvider>
         </Provider>
       </ApolloProvider>

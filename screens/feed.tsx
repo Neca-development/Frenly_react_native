@@ -53,7 +53,7 @@ function Feed({
 
   const refetchInfo = async () => {
     setFeedRefreshing(true);
-    refetchFeeds();
+    await refetchFeeds();
     await drafts.refetch();
     setFeedRefreshing(false);
   };
@@ -65,8 +65,7 @@ function Feed({
     navigation.navigate("Auth");
   };
 
-  const openProfile = (id: number) => {
-    // console.log(id);
+  const openProfile = (id: string) => {
     if (id == null) {
       return;
     }
@@ -83,7 +82,7 @@ function Feed({
           <Button
             onPress={() =>
               navigation.navigate("Profile", {
-                id: myProfileId,
+                id: myProfileId as string,
                 currentUser: true,
               })
             }
@@ -109,7 +108,9 @@ function Feed({
               id,
               stats,
               mirrorOf,
+              isMirror,
               lensId,
+              mirrorDescription,
             } = el;
 
             let index;
@@ -147,9 +148,10 @@ function Feed({
                     refetchInfo: refetchInfo,
                     txHash: metadata?.attributes[8].value,
                     blockchainType: metadata?.attributes[7].value,
-                    isMirror: dataFeeds?.data[Number(index)]?.isMirror,
-                    handleMirror: mirrorOf?.profile.handle,
+                    isMirror: isMirror,
+                    handleMirror: mirrorOf?.profile.ownedBy,
                     creator: profile.ownedBy,
+                    mirrorDescription,
                   }}
                 ></Post>
               );
