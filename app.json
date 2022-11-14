@@ -19,7 +19,7 @@
     },
     "android": {
       "versionCode": 9,
-      "package": "app.unistory.frenly.apk",
+      "package": "app.test.frenly.apk",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/app_icon.png",
         "backgroundColor": "#FFF"

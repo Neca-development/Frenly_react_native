@@ -6,7 +6,7 @@ import { SERVER_URL } from "../../../constants/Api";
 import { View, Text, Image, Pressable, Linking } from "react-native";
 import { IPostData } from "../post";
 import { useUpdate } from "../../../hooks/use-update-user.hook";
-
+import moment from "moment";
 interface IPostContent {
   userName: string;
   data: IPostData;
@@ -66,7 +66,11 @@ export default function PostContent(props: IPostContent) {
             </Text>
           </View>
         ) : null}
-        <Text className="text-base font-normal text-gray">{data.date}</Text>
+        <Text className="text-base font-normal text-gray">
+          {`${moment(data.date).format("MMM, DD")} at ${moment(
+            data.date
+          ).format("LT")}`}
+        </Text>
       </View>
 
       <View>

@@ -272,7 +272,7 @@ function Post(props: IPostProps) {
           )}
         </Pressable>
       )}
-      <View className="flex-1">
+      <View className="flex-1 ">
         <PostContent userName={username || data.name} data={data} />
         {isUnpublishedPost && (
           <View className="flex-row mt-2">
