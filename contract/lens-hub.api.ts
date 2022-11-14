@@ -39,6 +39,16 @@ async function getContractWithSigner(connector: any): Promise<Contract> {
   return new Contract(lensHubContract, lensHubABI, signer);
 }
 
+export async function getLensCommentId(connector: any, obj: any) {
+  const lensContractInst = await getContractWithSigner(connector);
+  const res = await lensContractInst.commentWithSig(obj);
+  const receipt = await res.wait();
+
+  const lensPostId = createLensPostId(receipt);
+
+  return lensPostId;
+}
+
 export async function getMirrorPostId(connector: any, obj: any) {
   const lensContractInst = await getContractWithSigner(connector);
   const res = await lensContractInst.mirrorWithSig(obj);

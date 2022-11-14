@@ -54,6 +54,10 @@ export default function PostContent(props: IPostContent) {
     <>
       <View>
         <Text className="text-base font-semibold">{userName}</Text>
+
+        {data.mirrorDescription ? (
+          <Text className="text-lg">{data.mirrorDescription}</Text>
+        ) : null}
         {data.isMirror ? (
           <View className="flex-row">
             <Text>🌀 mirrored from </Text>

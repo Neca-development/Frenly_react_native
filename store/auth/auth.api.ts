@@ -246,6 +246,19 @@ export const authApi = createApi({
         };
       },
     }),
+    createCommentMetadata: builder.query<
+      any,
+      { lensId: string; comment: string }
+    >({
+      query: ({ lensId, comment }) => {
+        return {
+          url: `content/comment/metadata`,
+          method: "POST",
+          body: { lensId, comment },
+          credentials: "omit",
+        };
+      },
+    }),
   }),
 });
 

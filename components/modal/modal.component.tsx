@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import { View, Text, Modal, Pressable, TextInput } from "react-native";
 
 interface IModalComponentProps {
-  children: React.ReactNode;
   title: string;
   onSubmit(mirrorText: string): void;
   onClose(): void;
 }
 
 export default function ModalComponent(props: IModalComponentProps) {
-  const { children, onSubmit, title, onClose } = props;
+  const { onSubmit, title, onClose } = props;
 
   const [mirrorText, setMirrorText] = useState("");
 

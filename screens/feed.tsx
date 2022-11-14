@@ -110,6 +110,7 @@ function Feed({
               mirrorOf,
               isMirror,
               lensId,
+              mirrorDescription,
             } = el;
 
             let index;
@@ -150,6 +151,7 @@ function Feed({
                     isMirror: isMirror,
                     handleMirror: mirrorOf?.profile.ownedBy,
                     creator: profile.ownedBy,
+                    mirrorDescription,
                   }}
                 ></Post>
               );

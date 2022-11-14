@@ -57,6 +57,7 @@ export interface IPostData {
   isMirror: boolean;
   handleMirror?: string;
   creator: string;
+  mirrorDescription: string;
 }
 interface IPostProps {
   isUnpublishedPost: boolean;
@@ -195,8 +196,8 @@ function Post(props: IPostProps) {
       return;
     }
     // setIsDescriptionView(false)
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       const typeD = await mirrorPublication({
         variables: {
           request: {
@@ -249,11 +250,7 @@ function Post(props: IPostProps) {
           title="Mirror post"
           onSubmit={mirrorHandler}
           onClose={() => setMirrorModalVisible(false)}
-        >
-          {/* <View className="flex-1 rounded-2xl bg-light-gray px-4 py-2  mr-2"> */}
-
-          {/* </View> */}
-        </ModalComponent>
+        />
       )}
       {!isUnpublishedPost && (
         <Pressable
@@ -330,7 +327,7 @@ function Post(props: IPostProps) {
           <Collapsible collapsed={isCommentsCollapsed}>
             <Comments
               refetchComment={refetchComments}
-              data={comments}
+              data={comments?.publications?.items}
               pubId={data.id}
               profileId={String(myProfileId)}
             />
