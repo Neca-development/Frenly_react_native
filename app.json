@@ -2,7 +2,7 @@
   "expo": {
     "name": "frenly",
     "slug": "frenly",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "scheme": "frenly",
     "orientation": "portrait",
     "icon": "./assets/icons/app_icon.png",
@@ -19,13 +19,21 @@
       "bundleIdentifier": "unistory.app.frenly"
     },
     "android": {
-      "versionCode": 10,
+      "versionCode": 11,
       "package": "app.test.frenly.apk",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/app_icon.png",
         "backgroundColor": "#FFF"
       }
     },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ],
     "web": {
       "favicon": "./assets/icons/eyes.png"
     },
