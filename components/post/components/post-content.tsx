@@ -15,8 +15,10 @@ interface IPostContent {
 }
 
 export default function PostContent(props: IPostContent) {
-  const { userName, data, isLoading = true } = props;
-  const { name: mirrorFrom } = useUpdate(data.handleMirror || "");
+  const { userName, data, isLoading } = props;
+  const { name: mirrorFrom, isLoading: mirrorLoading } = useUpdate(
+    data.handleMirror || ""
+  );
 
   const renderMessage = () => {
     let message;
@@ -59,7 +61,7 @@ export default function PostContent(props: IPostContent) {
           <SkeletonLoader>
             <SkeletonLoader.Item
               style={{
-                width: "30%",
+                width: 100,
                 height: 16,
                 marginBottom: 2,
                 marginTop: 6,
@@ -76,7 +78,7 @@ export default function PostContent(props: IPostContent) {
         {data?.isMirror && (
           <View className="flex-row align-bottom">
             <Text>🌀 mirrored from </Text>
-            {isLoading ? (
+            {mirrorLoading ? (
               <SkeletonLoader>
                 <SkeletonLoader.Item
                   style={{

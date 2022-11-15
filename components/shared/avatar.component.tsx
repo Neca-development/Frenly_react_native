@@ -2,7 +2,7 @@ import React from "react";
 
 import imagePlaceholder from "../../assets/images/temp-avatar.png";
 import SkeletonLoader from "expo-skeleton-loader";
-import { Image } from "react-native";
+import { Image, View } from "react-native";
 import { SERVER_URL } from "../../constants/Api";
 import { SizesEnum } from "../../common/helpers";
 
@@ -10,46 +10,57 @@ type AvatarProps = {
   isLoading: boolean;
   avatar: string;
   size: SizesEnum;
+  withCustomUri?: boolean;
 };
 
 export default function AvatarComponent(props: AvatarProps) {
-  const { isLoading, avatar, size } = props;
+  const { isLoading = true, avatar, size, withCustomUri = false } = props;
 
   function sizeSwitcher() {
     switch (size) {
       case SizesEnum.sm:
-        return "w-[32px] h-[32px]";
+        return {
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          backgroundColor: "grey",
+        };
       case SizesEnum.md:
-        return "w-[40px] h-[40px]";
+        return {
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          backgroundColor: "grey",
+        };
       case SizesEnum.lg:
-        return "w-[96px] h-[96px]";
+        return {
+          width: 96,
+          height: 96,
+          borderRadius: 48,
+          backgroundColor: "grey",
+        };
     }
   }
+  if (isLoading) {
+    return (
+      <SkeletonLoader>
+        <SkeletonLoader.Item style={sizeSwitcher()} />
+      </SkeletonLoader>
+    );
+  }
+
   return (
-    <>
-      {isLoading ? (
-        <SkeletonLoader>
-          <SkeletonLoader.Item
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-            }}
-          />
-        </SkeletonLoader>
-      ) : avatar ? (
+    <View className="border rounded-full border-border-color overflow-hidden">
+      {!withCustomUri && avatar ? (
         <Image
           source={{
             uri: `${SERVER_URL}avatars/${avatar}`,
           }}
-          className={`rounded-full ${sizeSwitcher()}`}
+          style={[sizeSwitcher()]}
         />
       ) : (
-        <Image
-          source={data.avatar || imagePlaceholder}
-          className={`rounded-full ${sizeSwitcher()}`}
-        />
+        <Image source={avatar || imagePlaceholder} style={sizeSwitcher()} />
       )}
-    </>
+    </View>
   );
 }

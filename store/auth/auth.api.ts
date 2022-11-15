@@ -216,8 +216,18 @@ export const authApi = createApi({
     }),
     uploadImage: builder.mutation<any, { avatar: File }>({
       query: (args) => {
-        const formData = new FormData();
-        formData.append("avatar", args.avatar, args.avatar.name);
+        let localUri = args.avatar.uri;
+        let filename = localUri.split("/").pop();
+        let match = /\.(\w+)$/.exec(filename);
+        let type = match ? `image/${match[1]}` : `image`;
+
+        let formData = new FormData();
+
+        formData.append("avatar", {
+          uri: localUri,
+          name: filename,
+          type,
+        });
 
         return {
           url: `user/avatar`,

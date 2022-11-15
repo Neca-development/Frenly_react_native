@@ -30,7 +30,6 @@ export default function ModalComponent(props: IModalComponentProps) {
               <TextInput
                 value={mirrorText}
                 onChangeText={(e) => {
-                  console.log(e);
                   setMirrorText(e);
                 }}
                 type="text"
