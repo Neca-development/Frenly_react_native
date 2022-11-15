@@ -19,6 +19,8 @@ import BackIcon from "../../../assets/icons/back-icon";
 import { useAppDispatch } from "../../../store/store.hook";
 import { logout } from "../../../store/auth/auth.slice";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
+import AvatarComponent from "../avatar.component";
+import { SizesEnum } from "../../../common/helpers";
 
 export interface IHeaderProperties {
   title: string;
@@ -119,19 +121,11 @@ export default function Header(props: IHeaderProperties) {
         </View>
       </View>
       <View className="w-full items-center pt-2 pb-8 px-4 ">
-        {avatar && avatar !== null ? (
-          <Image
-            source={{
-              uri: `${SERVER_URL}avatars/${avatar}`,
-            }}
-            className="w-[96px] h-[96px] rounded-full "
-          />
-        ) : (
-          <Image
-            source={tempAvatar}
-            className="w-[96px] h-[96px] rounded-full "
-          />
-        )}
+        <AvatarComponent
+          avatar={avatar}
+          isLoading={false}
+          size={SizesEnum.lg}
+        />
         <Text className="text-md font-semibold text-gray-darker ml-1 text-center mt-2">
           {descValue}
         </Text>

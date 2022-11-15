@@ -30,6 +30,8 @@ import { GET_DEFAULT_PROFILES } from "../store/lens/get-profile.query";
 import { useUpdate } from "../hooks/use-update-user.hook";
 import { SERVER_URL } from "../constants/Api";
 import AppLoader from "../components/app-loader.component";
+import AvatarComponent from "../components/shared/avatar.component";
+import { SizesEnum } from "../common/helpers";
 
 function Feed({
   navigation,
@@ -69,6 +71,7 @@ function Feed({
     name,
     description,
     avatar,
+    isLoading: profileLoading,
     uploadImage,
   } = useUpdate(connector.accounts[0] || "");
 
@@ -108,19 +111,11 @@ function Feed({
               })
             }
           >
-            {avatar && avatar !== null ? (
-              <Image
-                source={{
-                  uri: `${SERVER_URL}avatars/${avatar}`,
-                }}
-                className="w-[32px] h-[32px]  rounded-full "
-              />
-            ) : (
-              <Image
-                source={tempAvatar}
-                className="w-[32px] h-[32px]  rounded-full "
-              />
-            )}
+            <AvatarComponent
+              isLoading={profileLoading}
+              avatar={avatar}
+              size={SizesEnum.sm}
+            />
           </Pressable>
         </View>
       </View>

@@ -7,13 +7,15 @@ import { View, Text, Image, Pressable, Linking } from "react-native";
 import { IPostData } from "../post";
 import { useUpdate } from "../../../hooks/use-update-user.hook";
 import moment from "moment";
+import SkeletonLoader from "expo-skeleton-loader";
 interface IPostContent {
+  isLoading: boolean;
   userName: string;
   data: IPostData;
 }
 
 export default function PostContent(props: IPostContent) {
-  const { userName, data } = props;
+  const { userName, data, isLoading = true } = props;
   const { name: mirrorFrom } = useUpdate(data.handleMirror || "");
 
   const renderMessage = () => {
@@ -53,19 +55,46 @@ export default function PostContent(props: IPostContent) {
   return (
     <>
       <View>
-        <Text className="text-base font-semibold">{userName}</Text>
-
+        {isLoading ? (
+          <SkeletonLoader>
+            <SkeletonLoader.Item
+              style={{
+                width: "30%",
+                height: 16,
+                marginBottom: 2,
+                marginTop: 6,
+                borderRadius: 10,
+              }}
+            />
+          </SkeletonLoader>
+        ) : (
+          <Text className="text-base font-semibold">{userName}</Text>
+        )}
         {data.mirrorDescription ? (
           <Text className="text-lg">{data.mirrorDescription}</Text>
         ) : null}
-        {data.isMirror ? (
-          <View className="flex-row">
+        {data?.isMirror && (
+          <View className="flex-row align-bottom">
             <Text>🌀 mirrored from </Text>
-            <Text className="font-bold">
-              {mirrorFrom ? mirrorFrom : data.handleMirror}
-            </Text>
+            {isLoading ? (
+              <SkeletonLoader>
+                <SkeletonLoader.Item
+                  style={{
+                    width: 100,
+                    height: 10,
+                    marginBottom: 2,
+                    marginTop: 6,
+                    borderRadius: 10,
+                  }}
+                />
+              </SkeletonLoader>
+            ) : (
+              <Text className="font-bold">
+                {mirrorFrom ? mirrorFrom : data.handleMirror}
+              </Text>
+            )}
           </View>
-        ) : null}
+        )}
         <Text className="text-base font-normal text-gray">
           {`${moment(data.date).format("MMM, DD")} at ${moment(
             data.date

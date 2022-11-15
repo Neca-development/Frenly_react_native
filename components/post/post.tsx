@@ -31,6 +31,9 @@ import {
 } from "../unpublished-posts/create-post.utils";
 import ModalComponent from "../modal/modal.component";
 import AppLoader from "../app-loader.component";
+import SkeletonLoader from "expo-skeleton-loader";
+import AvatarComponent from "../shared/avatar.component";
+import { SizesEnum } from "../../common/helpers";
 
 export interface IPostData {
   avatar?: any;
@@ -257,23 +260,19 @@ function Post(props: IPostProps) {
           onPress={() => openProfile(data.profileId)}
           className="mr-4 items-center border rounded-full border-border-color overflow-hidden"
         >
-          {avatar ? (
-            <Image
-              source={{
-                uri: `${SERVER_URL}avatars/${avatar}`,
-              }}
-              className="w-[40px] h-[40px] rounded-full"
-            />
-          ) : (
-            <Image
-              source={data.avatar || imagePlaceholder}
-              className="w-[40px] h-[40px] rounded-full"
-            />
-          )}
+          <AvatarComponent
+            isLoading={creatorLoading}
+            avatar={avatar || data.avatar}
+            size={SizesEnum.md}
+          />
         </Pressable>
       )}
       <View className="flex-1 ">
-        <PostContent userName={username || data.name} data={data} />
+        <PostContent
+          isLoading={creatorLoading}
+          userName={username || data.name}
+          data={data}
+        />
         {isUnpublishedPost && (
           <View className="flex-row mt-2">
             <Button
