@@ -4,6 +4,7 @@
     "slug": "frenly",
     "version": "0.0.6",
     "scheme": "frenly",
+    "userInterfaceStyle": "automatic",
     "orientation": "portrait",
     "icon": "./assets/icons/app_icon.png",
     "splash": {

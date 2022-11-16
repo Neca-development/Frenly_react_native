@@ -247,6 +247,33 @@ export const authApi = createApi({
         };
       },
     }),
+    getIsFollow: builder.query<any, { address: string }>({
+      query: (args) => {
+        return {
+          url: `user/${args.address}/is-follow`,
+          method: "GET",
+          credentials: "omit",
+        };
+      },
+    }),
+    subscribeUser: builder.mutation<any, { address: string }>({
+      query: ({ address }) => {
+        return {
+          url: `user/subscribe/${address}`,
+          method: "POST",
+          credentials: "omit",
+        };
+      },
+    }),
+    unSubscribeUser: builder.mutation<any, { address: string }>({
+      query: ({ address }) => {
+        return {
+          url: `user/unsubscribe/${address}`,
+          method: "DELETE",
+          credentials: "omit",
+        };
+      },
+    }),
     getContentMetadata: builder.query<any, { contentId: string }>({
       query: ({ contentId }) => {
         return {
@@ -291,5 +318,8 @@ export const {
   useRemoveContentMutation,
   useMirrorPostMutation,
   useGetUserInfoQuery,
+  useGetIsFollowQuery,
+  useSubscribeUserMutation,
+  useUnSubscribeUserMutation,
   useGetFilteredFeedQuery,
 } = authApi;

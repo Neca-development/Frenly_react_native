@@ -18,6 +18,7 @@ import Toast from "react-native-toast-message";
 import * as ImagePicker from "expo-image-picker";
 import PencilIcon from "../../../assets/icons/pencil-icon";
 import AppLoader from "../../app-loader.component";
+import HeaderEdit from "./header-edit/header-edit.component";
 
 export interface IHeaderProperties {
   title: string;
@@ -35,24 +36,19 @@ export interface IHeaderProperties {
   setFreeFollow?: (state: boolean) => void;
   changeFollowModule?: () => void;
   isFollowModule?: boolean;
+  isFollowUnFollowLoading: boolean;
 }
 
 export default function Header(props: IHeaderProperties) {
   const {
-    title,
-    showPostAuthor = false,
     isOwner,
-    accountId,
     nickname,
     address,
     followHandle,
     unfollowHandle,
     followers,
     isFollow,
-    isFreeFollow,
-    setFreeFollow,
-    changeFollowModule,
-    isFollowModule,
+    isFollowUnFollowLoading,
   } = props;
 
   const [isEdit, setIsEdit] = useState(false);
@@ -213,57 +209,41 @@ export default function Header(props: IHeaderProperties) {
           )}
         </Pressable>
         {isEdit ? (
-          <>
-            <Text className="text-md font-semibold text-gray-darker   text-center mt-2">
-              Name
-            </Text>
-            <View className="min-w-[75%] rounded-2xl bg-light-gray flex-row  mb-1">
-              <TextInput
-                value={nameValue}
-                onChangeText={(text) => setNameValue(text)}
-                className="outline-none  flex-1 px-4 py-2"
-              />
-            </View>
-            <Text className="text-md font-semibold text-gray-darker text-center mt-2 mb-1">
-              Description
-            </Text>
-            <View className="min-w-[75%] rounded-2xl bg-light-gray flex-row  mb-10">
-              <TextInput
-                value={descValue}
-                onChangeText={(text) => setDescValue(text)}
-                className="outline-none flex-1 px-4 py-2"
-              />
-            </View>
-            <Button
-              style="min-w-[75%] mb-4"
-              onPress={saveHandle}
-              title="Save"
-            />
-            <Button
-              style="min-w-[75%] "
-              buttonStyle="bg-red-400"
-              onPress={logOut}
-              title="Log out"
-            />
-          </>
+          <HeaderEdit
+            setNameValue={setNameValue}
+            nameValue={nameValue}
+            setDescValue={setDescValue}
+            descValue={descValue}
+            saveHandle={saveHandle}
+            logOut={logOut}
+          />
         ) : (
           <>
             <Text className="text-md font-semibold text-gray-darker ml-1 text-center mt-2">
               {descValue}
             </Text>
             <Text className="text-base font-normal text-gray mb-5 text-center m-auto mt-4">
-              Followers: {followers}
+              Followers: {userInfo?.data?.totalFollowers ?? 0}
             </Text>
           </>
         )}
 
-        {/* {!isOwner ? (
-          isFollow ? (
-            <Button title="Follow" style="mt-2" onPress={followHandle} />
+        {!isOwner &&
+          (isFollow ? (
+            <Button
+              title="Unfollow"
+              style="mt-2"
+              onPress={unfollowHandle}
+              disabled={isFollowUnFollowLoading}
+            />
           ) : (
-            <Button title="Unfollow" style="mt-2" onPress={unfollowHandle} />
-          )
-        ) : null} */}
+            <Button
+              title="Follow"
+              style="mt-2"
+              onPress={followHandle}
+              disabled={isFollowUnFollowLoading}
+            />
+          ))}
       </View>
     </>
   );
