@@ -56,9 +56,10 @@ export default function UserPosts(props: IUserPosts) {
               txHash: metadata.attributes[8].value,
               blockchainType: metadata.attributes[7].value,
               isMirror: Boolean(mirrorOf),
-              handleMirror: mirrorOf?.profile.handle,
+              handleMirror: mirrorOf?.profile.ownedBy,
+              creator: profile.ownedBy,
             }}
-          ></Post>
+          />
         );
       })}
     </ScrollView>

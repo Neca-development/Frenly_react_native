@@ -1,5 +1,5 @@
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import SendIcon from "../assets/icons/send-icon";
 import { getLensCommentId } from "../contract/lens-hub.api";
@@ -18,7 +18,7 @@ import AppLoader from "./app-loader.component";
 interface ICommentsProps {
   pubId: string | number;
   profileId: string;
-  data: any;
+  data: [];
   refetchComment: Function;
 }
 
@@ -27,9 +27,17 @@ function Comments(props: ICommentsProps) {
 
   const dispatch = useAppDispatch();
 
+  const [comments, setComments] = useState([]);
   const [commentValue, setCommentValue] = useState("");
   const connector = useWalletConnect();
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (data) {
+      const newValue = data.slice().reverse();
+      setComments(newValue);
+    }
+  }, [data]);
 
   async function commentHandler() {
     try {
@@ -90,7 +98,7 @@ function Comments(props: ICommentsProps) {
       {isLoading && <AppLoader />}
       <Text className="text-xl font-bold mb-4">Comments</Text>
       {/* {newComment && <Comment {...newComment} />} */}
-      {data?.map((comment: IComment) => (
+      {comments?.map((comment: IComment) => (
         <Comment key={comment.id} {...comment} />
       ))}
       <View className="w-full pt-4 pb-4 flex-row items-center">
