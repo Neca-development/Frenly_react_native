@@ -4,7 +4,7 @@ import { ScrollView, Text, View } from "react-native";
 import { useUpdate } from "../../hooks/use-update-user.hook";
 import AvatarComponent from "./avatar.component";
 import { SizesEnum } from "../../common/helpers";
-
+//
 export interface IComment {
   metadata: any;
   profile: any;
