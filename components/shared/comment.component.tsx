@@ -1,8 +1,6 @@
 import moment from "moment";
 import React from "react";
-import imagePlaceholder from "../../assets/images/temp-avatar.png";
-import { Image, ScrollView, Text, View } from "react-native";
-import { SERVER_URL } from "../../constants/Api";
+import { ScrollView, Text, View } from "react-native";
 import { useUpdate } from "../../hooks/use-update-user.hook";
 import AvatarComponent from "./avatar.component";
 import { SizesEnum } from "../../common/helpers";
