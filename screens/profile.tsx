@@ -7,9 +7,15 @@ import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import { useGetWalletProfileId } from "../contract/lens-hub.api";
 import Header from "../components/shared/header/header.component";
 import { GET_DEFAULT_PROFILES } from "../store/lens/get-profile.query";
-import { useGetUnpublishedContentQuery } from "../store/auth/auth.api";
+import {
+  useGetIsFollowQuery,
+  useGetUnpublishedContentQuery,
+  useSubscribeUserMutation,
+  useUnSubscribeUserMutation,
+} from "../store/auth/auth.api";
 import UnpublishedPOsts from "../components/unpublished-posts/unpublished-posts";
 import UserPosts from "../components/user-posts/user-posts";
+import Toast from "react-native-toast-message";
 
 interface IProfileProps {
   route: any;
@@ -24,6 +30,10 @@ export default function Profile(props: IProfileProps) {
   );
   const [isLoading, setIsLoading] = useState(true);
   const { id, currentUser = false } = route.params;
+  const [subscribeUser] = useSubscribeUserMutation();
+  const [unSubscribeUser] = useUnSubscribeUserMutation();
+  const [isFollowUnFollowLoading, setFollowUnFollowLoading] = useState(false);
+
   const {
     data: feeds,
     refetch: refetchPublications,
@@ -56,6 +66,75 @@ export default function Profile(props: IProfileProps) {
     }
   );
 
+  const {
+    data: isFollow,
+    refetch: refetchIsFollow,
+    error,
+  } = useGetIsFollowQuery(
+    {
+      address: dataProfile?.profile?.ownedBy,
+    },
+    { skip: dataProfile?.profile?.ownedBy == null }
+  );
+
+  const followHandler = async () => {
+    try {
+      setFollowUnFollowLoading(true);
+      const res = await subscribeUser({
+        address: dataProfile?.profile?.ownedBy as string,
+      });
+      if (res?.error) {
+        throw res.error;
+      }
+      console.log("✅ follow");
+      refetchIsFollow();
+      Toast.show({
+        type: "success",
+        text1: "✅ Success",
+        text2: "You have successfully subscribed",
+      });
+    } catch (error) {
+      console.log("⛔", error);
+      Toast.show({
+        type: "error",
+        text1: "❌ Error",
+        text2: "Try again later",
+      });
+    } finally {
+      setFollowUnFollowLoading(false);
+    }
+  };
+
+  const unFollowHandler = async () => {
+    try {
+      setFollowUnFollowLoading(true);
+      const res = await unSubscribeUser({
+        address: dataProfile?.profile?.ownedBy as string,
+      });
+      if (res?.error) {
+        throw res.error;
+      }
+      console.log(res);
+
+      console.log("✅ unfollow");
+      refetchIsFollow();
+      Toast.show({
+        type: "success",
+        text1: "✅ Success",
+        text2: "You have successfully unsubscribed",
+      });
+    } catch (error) {
+      console.log("⛔", error);
+      Toast.show({
+        type: "error",
+        text1: "❌ Error",
+        text2: "Try again later",
+      });
+    } finally {
+      setFollowUnFollowLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (currentUser) {
       setIsLoading(unpublishedLoading);
@@ -72,13 +151,11 @@ export default function Profile(props: IProfileProps) {
         nickname={dataProfile?.profile.handle}
         address={dataProfile?.profile.ownedBy}
         isFollowModule={dataProfile?.profile?.followModule !== null}
-        // followHandle={followHandler}
-        // unfollowHandle={unfollowHandler}
+        followHandle={followHandler}
+        unfollowHandle={unFollowHandler}
         followers={dataProfile?.profile.stats.totalFollowers}
-        isFollow={dataProfile?.profile.isFollowedByMe}
-        // isFreeFollow={isFreeFollow}
-        // setFreeFollow={setFreeFollow}
-        // changeFollowModule={changeFollowModule}
+        isFollow={Boolean(isFollow?.data)}
+        isFollowUnFollowLoading={isFollowUnFollowLoading}
       />
       {currentUser ? (
         <UnpublishedPOsts
