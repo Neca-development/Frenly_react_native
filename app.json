@@ -2,7 +2,7 @@
   "expo": {
     "name": "frenly",
     "slug": "frenly",
-    "version": "1.0.5",
+    "version": "0.0.6",
     "scheme": "frenly",
     "orientation": "portrait",
     "icon": "./assets/icons/app_icon.png",
@@ -19,7 +19,7 @@
       "bundleIdentifier": "unistory.app.frenly"
     },
     "android": {
-      "versionCode": 12,
+      "versionCode": 13,
       "package": "app.test.frenly.apk",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/app_icon.png",
