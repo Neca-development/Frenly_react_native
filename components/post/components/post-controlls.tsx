@@ -3,6 +3,7 @@ import React from "react";
 import commentIcon from "../../../assets/icons/comment.png";
 import cycleIcon from "../../../assets/icons/cycle.png";
 import heartIcon from "../../../assets/icons/heart.png";
+import heartBorderIcon from "../../../assets/icons/hearth-border.png";
 
 import { View, Text, Pressable, Image, ActivityIndicator } from "react-native";
 
@@ -37,7 +38,15 @@ export default function PostControls(props: IPostControls) {
           isLikeRequest ? "bg-gray" : ""
         } ${isLiked ? "bg-red-300" : ""}`}
       >
-        <Image source={heartIcon} className="h-5 w-5" resizeMode="contain" />
+        {isLiked ? (
+          <Image source={heartIcon} className="h-5 w-5" resizeMode="contain" />
+        ) : (
+          <Image
+            source={heartBorderIcon}
+            className="h-5 w-5"
+            resizeMode="contain"
+          />
+        )}
 
         <Text
           className={`text-md font-semibold ml-1 ${
