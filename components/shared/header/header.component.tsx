@@ -13,7 +13,7 @@ import AvatarComponent from "../avatar.component";
 import { SizesEnum } from "../../../common/helpers";
 import EditIcon from "../../../assets/icons/edit-icon";
 import CloseIcon from "../../../assets/icons/close-icon";
-import Button from "../../Button";
+import Button from "../button.component";
 import Toast from "react-native-toast-message";
 import * as ImagePicker from "expo-image-picker";
 import PencilIcon from "../../../assets/icons/pencil-icon";

@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import EyesIcon from "../assets/icons/eyes.tsx";
-import Button from "../components/Button";
+import Button from "../components/shared/button.component";
 import Post from "../components/post/post";
 import tempAvatar from "../assets/images/temp-avatar.png";
 

@@ -3,7 +3,7 @@ import { Image, StyleSheet, TouchableOpacity } from "react-native";
 
 import gif from "../assets/gifs/eyes.gif";
 
-import { Text, View } from "../components/Themed";
+import { Text, View } from "../components/themed-components";
 import { RootTabScreenProps } from "../types";
 
 import { useMutation } from "@apollo/client";

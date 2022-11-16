@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Image, Linking, Pressable, Text, View } from "react-native";
-import Button from "../Button";
+import Button from "../shared/button.component";
 
 import { useMutation, useQuery } from "@apollo/client";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import { id } from "ethers/lib/utils";
 import Toast from "react-native-toast-message";
 import Collapsible from "react-native-collapsible";
-import imagePlaceholder from "../../assets/images/temp-avatar.png";
+
 import {
   getMirrorPostId,
   useGetWalletProfileId,
@@ -19,7 +19,7 @@ import { CREATE_MIRROR_TYPED_DATA } from "../../store/lens/post/add-mirror.mutat
 import { CANCEL_LIKE_TO_POST } from "../../store/lens/post/cancel-like.mutation";
 import { GET_POST_QUERY } from "../../store/lens/post/get-post.query";
 import { GET_REACTIONS } from "../../store/lens/post/get-reaction.query";
-import Comments from "../Comments";
+import Comments from "../comments.component";
 import { SERVER_URL } from "../../constants/Api";
 import { useUpdate } from "../../hooks/use-update-user.hook";
 import PostControls from "./components/post-controlls";
@@ -33,6 +33,7 @@ import ModalComponent from "../modal/modal.component";
 import AppLoader from "../app-loader.component";
 import AvatarComponent from "../shared/avatar.component";
 import { SizesEnum } from "../../common/helpers";
+import createTwitterLink from "../../helpers/create-twitter-link";
 
 export interface IPostData {
   avatar?: any;
@@ -98,6 +99,7 @@ function Post(props: IPostProps) {
   const [cancelLikePostToLens, dataCancelLikes] =
     useMutation(CANCEL_LIKE_TO_POST);
   const [isLikeRequest, setIsLikeRequest] = useState(false);
+  const [repostTwitterLink, setRepostTwitterLink] = useState("");
 
   const { data: comments, refetch: refetchComments } = useQuery(
     GET_PUBLICATIONS,
@@ -244,6 +246,10 @@ function Post(props: IPostProps) {
     }
   };
 
+  useEffect(() => {
+    setRepostTwitterLink(createTwitterLink(data));
+  }, [data]);
+
   return (
     <View className="flex-row items-start px-4 border-b border-border-color pt-2 pb-4">
       {isLoading && <AppLoader />}
@@ -302,7 +308,6 @@ function Post(props: IPostProps) {
             }
           >
             <Text className="text-sm text-main" rel="noreferrer">
-              Check on{" "}
               {data.blockchainType === "ETHEREUM" ? "Etherscan" : "Polygonscan"}
             </Text>
           </Pressable>
@@ -318,6 +323,7 @@ function Post(props: IPostProps) {
               likesCount={postData?.publication?.stats.totalUpvotes}
               mirrorsCount={data.totalMirror}
               isLikeRequest={isLikeRequest}
+              repostTwitterLink={repostTwitterLink}
             />
           )}
         </View>

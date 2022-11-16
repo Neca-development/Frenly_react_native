@@ -2,8 +2,7 @@ import React from "react";
 
 import loaderGif from "../assets/gifs/duck_loader.gif";
 
-import { View, Text, Image, Modal } from "react-native";
-import { FullWindowOverlay } from "react-native-screens";
+import { View, Image, Modal } from "react-native";
 
 export default function AppLoader() {
   return (

@@ -5,7 +5,15 @@ import cycleIcon from "../../../assets/icons/cycle.png";
 import heartIcon from "../../../assets/icons/heart.png";
 import heartBorderIcon from "../../../assets/icons/hearth-border.png";
 
-import { View, Text, Pressable, Image, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  ActivityIndicator,
+  Linking,
+} from "react-native";
+import TwitterIcon from "../../../assets/icons/twitter";
 
 interface IPostControls {
   onCommentsPress(): void;
@@ -16,6 +24,7 @@ interface IPostControls {
   mirrorsCount: number;
   isLikeRequest: boolean;
   isLiked: boolean;
+  repostTwitterLink: string;
 }
 
 export default function PostControls(props: IPostControls) {
@@ -28,22 +37,23 @@ export default function PostControls(props: IPostControls) {
     isLiked,
     isLikeRequest,
     onLikePress,
+    repostTwitterLink,
   } = props;
   return (
     <View className="flex-row items-center">
       <Pressable
         disabled={isLikeRequest}
         onPress={onLikePress}
-        className={`flex-row items-center justify-center rounded-2xl py-1 pl-2 pr-3 ${
+        className={`flex-row items-center justify-center rounded-2xl py-1 px-2 ${
           isLikeRequest ? "bg-gray" : ""
         } ${isLiked ? "bg-red-300" : ""}`}
       >
         {isLiked ? (
-          <Image source={heartIcon} className="h-5 w-5" resizeMode="contain" />
+          <Image source={heartIcon} className="h-4 w-4" resizeMode="contain" />
         ) : (
           <Image
             source={heartBorderIcon}
-            className="h-5 w-5"
+            className="h-4 w-4"
             resizeMode="contain"
           />
         )}
@@ -61,7 +71,7 @@ export default function PostControls(props: IPostControls) {
         onPress={onCommentsPress}
         className="flex-row items-center justify-center py-1 px-2"
       >
-        <Image source={commentIcon} className="h-5 w-5" resizeMode="contain" />
+        <Image source={commentIcon} className="h-4 w-4" resizeMode="contain" />
         <Text className="text-md font-semibold text-neutral-400 ml-1">
           {commentsCount ?? 0}
         </Text>
@@ -70,10 +80,16 @@ export default function PostControls(props: IPostControls) {
         onPress={onMirrorPress}
         className="flex-row items-center justify-center py-1 px-2"
       >
-        <Image source={cycleIcon} className="h-5 w-5" resizeMode="contain" />
+        <Image source={cycleIcon} className="h-4 w-4" resizeMode="contain" />
         <Text className="text-md font-semibold text-neutral-400 ml-1">
           {mirrorsCount ?? 0}
         </Text>
+      </Pressable>
+      <Pressable
+        onPress={() => Linking.openURL(repostTwitterLink)}
+        className="flex-row items-center justify-center py-1 px-2"
+      >
+        <TwitterIcon />
       </Pressable>
     </View>
   );

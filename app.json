@@ -2,7 +2,7 @@
   "expo": {
     "name": "frenly",
     "slug": "frenly",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "scheme": "frenly",
     "userInterfaceStyle": "automatic",
     "orientation": "portrait",
@@ -20,8 +20,8 @@
       "bundleIdentifier": "unistory.app.frenly"
     },
     "android": {
-      "versionCode": 13,
-      "package": "app.test.frenly.apk",
+      "versionCode": 14,
+      "package": "app.unistory.frenly.apk",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/app_icon.png",
         "backgroundColor": "#FFF"

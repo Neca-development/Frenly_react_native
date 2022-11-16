@@ -11,12 +11,12 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
-import { ColorSchemeName, Image, View } from "react-native";
-import Auth from "../screens/auth";
-import Feed from "../screens/feed";
+import { ColorSchemeName } from "react-native";
+import Auth from "../screens/auth.screen";
+import Feed from "../screens/feed.screen";
 
-import ModalScreen from "../screens/ModalScreen";
-import NotFoundScreen from "../screens/NotFoundScreen";
+import ModalScreen from "../screens/modal.screen";
+import NotFoundScreen from "../screens/not-found.screen";
 import { RootStackParamList } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 

@@ -8,6 +8,8 @@ import { IPostData } from "../post";
 import { useUpdate } from "../../../hooks/use-update-user.hook";
 import moment from "moment";
 import SkeletonLoader from "expo-skeleton-loader";
+import renderMessage from "../../../helpers/render-message";
+
 interface IPostContent {
   isLoading: boolean;
   userName: string;
@@ -20,40 +22,6 @@ export default function PostContent(props: IPostContent) {
     data.handleMirror || ""
   );
 
-  const renderMessage = () => {
-    let message;
-    const messageTypeClone =
-      data.from == "0x0000000000000000000000000000000000000000"
-        ? "MINTED"
-        : data.messageType;
-
-    switch (messageTypeClone) {
-      case "MINTED":
-        message = "🎉 Minted a new ";
-        break;
-      case "RECEIVE":
-        message = "📤 Received ";
-        break;
-      case "SEND":
-        message = "📤 Sent ";
-        break;
-      default:
-        break;
-    }
-
-    switch (data.itemType) {
-      case "nft":
-        message += `${data.messageType !== "MINTED" ? "an" : ""} NFT`;
-        break;
-      case "token":
-        message += "tokens";
-        break;
-      default:
-        break;
-    }
-
-    return `${message} `;
-  };
   return (
     <>
       <View>
@@ -106,7 +74,7 @@ export default function PostContent(props: IPostContent) {
 
       <View>
         <Text className="text-base font-semibold">
-          {renderMessage()}{" "}
+          {renderMessage(data)}{" "}
           {data.from !== "0x0000000000000000000000000000000000000000" ? (
             data.messageType == "RECEIVE" ? (
               <>from&nbsp;</>
