@@ -1,10 +1,10 @@
 import moment from "moment";
 import React from "react";
-import imagePlaceholder from "../assets/images/temp-avatar.png";
-import { Image, ScrollView, Text, View } from "react-native";
-import { SERVER_URL } from "../constants/Api";
-import { useUpdate } from "../hooks/use-update-user.hook";
-
+import { ScrollView, Text, View } from "react-native";
+import { useUpdate } from "../../hooks/use-update-user.hook";
+import AvatarComponent from "./avatar.component";
+import { SizesEnum } from "../../common/helpers";
+//
 export interface IComment {
   metadata: any;
   profile: any;
@@ -13,23 +13,17 @@ export interface IComment {
 }
 
 const Comment = ({ metadata, profile, createdAt }: IComment) => {
-  const { avatar, name } = useUpdate(profile.ownedBy);
+  const { avatar, name, isLoading } = useUpdate(profile.ownedBy);
   const commentDate = moment(createdAt).fromNow(true);
   return (
     <ScrollView horizontal contentContainerStyle={{ width: "100%" }}>
       <View className="flex-1 flex-row items-center mb-2">
         <View className="flex items-center border rounded-full border-border-color overflow-hidden self-start mr-2">
-          {avatar ? (
-            <Image
-              source={{
-                uri: `${SERVER_URL}avatars/${avatar}`,
-              }}
-              className="w-[40px] h-[40px] rounded-full"
-            />
-          ) : (
-            <Image
-              source={profile?.avatar || imagePlaceholder}
-              className="w-[40px] h-[40px] rounded-full"
+          {avatar && (
+            <AvatarComponent
+              avatar={avatar}
+              isLoading={isLoading}
+              size={SizesEnum.md}
             />
           )}
         </View>

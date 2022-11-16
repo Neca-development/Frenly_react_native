@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import SendIcon from "../assets/icons/send-icon";
 import { getLensCommentId } from "../contract/lens-hub.api";
-import Comment, { IComment } from "./Comment";
+import Comment, { IComment } from "./shared/comment.component";
 import {
   createLensCommentIdParams,
   getSignatureFromTypedData,

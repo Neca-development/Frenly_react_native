@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TextInput } from "react-native";
 
-import Button from "../../../Button";
+import Button from "../../button.component";
 
 interface IHeaderEdit {
   setNameValue(text: string): void;
