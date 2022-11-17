@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Image, Linking, Pressable, Text, View } from "react-native";
+import { Linking, Pressable, Text, View } from "react-native";
 import Button from "../shared/button.component";
 
 import { useMutation, useQuery } from "@apollo/client";
@@ -20,7 +20,6 @@ import { CANCEL_LIKE_TO_POST } from "../../store/lens/post/cancel-like.mutation"
 import { GET_POST_QUERY } from "../../store/lens/post/get-post.query";
 import { GET_REACTIONS } from "../../store/lens/post/get-reaction.query";
 import Comments from "../comments.component";
-import { SERVER_URL } from "../../constants/Api";
 import { useUpdate } from "../../hooks/use-update-user.hook";
 import PostControls from "./components/post-controlls";
 import PostContent from "./components/post-content";
@@ -34,10 +33,11 @@ import AppLoader from "../app-loader.component";
 import AvatarComponent from "../shared/avatar.component";
 import { SizesEnum } from "../../common/helpers";
 import createTwitterLink from "../../helpers/create-twitter-link";
+import AvatarWithLink from "../shared/avatar-with-link.component";
 
 export interface IPostData {
   avatar?: any;
-  profileId: number;
+  profileId: string;
   name: string;
   contractAddress: string;
   date: string;
@@ -66,18 +66,11 @@ interface IPostProps {
   isUnpublishedPost: boolean;
   addPost(): void;
   declinePost(): void;
-  openProfile?(id: number): void;
   data: IPostData;
 }
 
-function Post(props: IPostProps) {
-  const {
-    data,
-    isUnpublishedPost,
-    openProfile = () => null,
-    addPost,
-    declinePost,
-  } = props;
+const Post = React.memo((props: IPostProps) => {
+  const { data, isUnpublishedPost, addPost, declinePost } = props;
   const [isCommentsCollapsed, changeCommentsCollapsed] = useState(true);
   const [isMirrorModalVisible, setMirrorModalVisible] = useState(false);
 
@@ -89,9 +82,7 @@ function Post(props: IPostProps) {
 
   const {
     name: username,
-    description,
     avatar,
-    uploadImage,
     isLoading: creatorLoading,
   } = useUpdate(data.creator);
   const [isLoading, setIsLoading] = useState(false);
@@ -261,16 +252,22 @@ function Post(props: IPostProps) {
         />
       )}
       {!isUnpublishedPost && (
-        <Pressable
-          onPress={() => openProfile(data.profileId)}
-          className="mr-4 items-center"
-        >
-          <AvatarComponent
-            isLoading={creatorLoading}
-            avatar={avatar || data.avatar}
-            size={SizesEnum.md}
-          />
-        </Pressable>
+        // <Pressable
+        //   onPress={() => openProfile(data.profileId)}
+        //   className="mr-4 items-center"
+        // >
+        //   <AvatarComponent
+        //     isLoading={creatorLoading}
+        //     avatar={avatar || data.avatar}
+        //     size={SizesEnum.md}
+        //   />
+        // </Pressable>
+        <AvatarWithLink
+          profileId={data.profileId}
+          isLoading={creatorLoading}
+          avatar={avatar || data.avatar}
+          size={SizesEnum.md}
+        />
       )}
       <View className="flex-1 ">
         <PostContent
@@ -340,6 +337,6 @@ function Post(props: IPostProps) {
       </View>
     </View>
   );
-}
+});
 
 export default Post;

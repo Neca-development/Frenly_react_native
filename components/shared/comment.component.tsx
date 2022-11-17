@@ -4,6 +4,7 @@ import { ScrollView, Text, View } from "react-native";
 import { useUpdate } from "../../hooks/use-update-user.hook";
 import AvatarComponent from "./avatar.component";
 import { SizesEnum } from "../../common/helpers";
+import AvatarWithLink from "./avatar-with-link.component";
 //
 export interface IComment {
   metadata: any;
@@ -15,12 +16,14 @@ export interface IComment {
 const Comment = ({ metadata, profile, createdAt }: IComment) => {
   const { avatar, name, isLoading } = useUpdate(profile.ownedBy);
   const commentDate = moment(createdAt).fromNow(true);
+  console.log(profile);
   return (
     <ScrollView horizontal contentContainerStyle={{ width: "100%" }}>
       <View className="flex-1 flex-row items-center mb-2">
-        <View className="flex items-center border rounded-full border-border-color overflow-hidden self-start mr-2">
+        <View className="flex items-center  self-start ">
           {avatar && (
-            <AvatarComponent
+            <AvatarWithLink
+              profileId={profile.id}
               avatar={avatar}
               isLoading={isLoading}
               size={SizesEnum.md}

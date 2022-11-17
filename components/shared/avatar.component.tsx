@@ -6,14 +6,14 @@ import { Image, View } from "react-native";
 import { SERVER_URL } from "../../constants/Api";
 import { SizesEnum } from "../../common/helpers";
 
-type AvatarProps = {
+export interface IAvatarProps {
   isLoading: boolean;
   avatar: string;
   size: SizesEnum;
   withCustomUri?: boolean;
-};
+}
 
-export default function AvatarComponent(props: AvatarProps) {
+export default function AvatarComponent(props: IAvatarProps) {
   const { isLoading = true, avatar, size, withCustomUri = false } = props;
 
   function sizeSwitcher() {

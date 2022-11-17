@@ -1,45 +1,54 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Image,
+  ActivityIndicator,
+  FlatList,
   Pressable,
   RefreshControl,
   SafeAreaView,
-  ScrollView,
   Text,
   View,
 } from "react-native";
-import EyesIcon from "../assets/icons/eyes.tsx";
-import Button from "../components/shared/button.component";
+import EyesIcon from "../assets/icons/eyes";
 import Post from "../components/post/post";
-import tempAvatar from "../assets/images/temp-avatar.png";
-
-import { useQuery } from "@apollo/client";
 import safeViewAndroid from "../helpers/safe-view-android";
-import {
-  useGetFeedQuery,
-  useGetFilteredFeedQuery,
-} from "../store/auth/auth.api";
+import AvatarComponent from "../components/shared/avatar.component";
+import Colors from "../constants/Colors";
+import { useQuery } from "@apollo/client";
+import { useGetFilteredFeedQuery } from "../store/auth/auth.api";
 import { GET_PUBLICATIONS } from "../store/lens/get-publication.query";
-
-import { useAppDispatch } from "../store/store.hook";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useGetWalletProfileId } from "../contract/lens-hub.api";
-import { GET_DEFAULT_PROFILES } from "../store/lens/get-profile.query";
 import { useUpdate } from "../hooks/use-update-user.hook";
-import { SERVER_URL } from "../constants/Api";
-import AppLoader from "../components/app-loader.component";
-import AvatarComponent from "../components/shared/avatar.component";
 import { SizesEnum } from "../common/helpers";
+
+const takeFeedValue = 20;
+const initialSkipValue = 0;
+const itemFromBottomToFetch = 4;
 
 function Feed({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "Feed">) {
-  const { data: dataFeeds, refetch: refetchFeeds } = useGetFilteredFeedQuery({
-    take: 40,
-    skip: 0,
+  const [skipValue, setSkipValue] = useState(initialSkipValue);
+  const [isFeedRefreshing, setFeedRefreshing] = useState(false);
+  const [feed, setFeed] = useState<any[]>([]);
+  const [isFiltrationLoading, setFiltrationLoading] = useState(false);
+  const [isFeedEnd, setIsFeedEnd] = useState(false);
+
+  const {
+    data: dataFeeds,
+    refetch: refetchFeeds,
+    isFetching: isFeedFromBackLoading,
+    error: feedsError,
+  } = useGetFilteredFeedQuery({
+    take: takeFeedValue,
+    skip: skipValue,
   });
+  if (feedsError) {
+    console.log("❌", feedsError);
+  }
+
   const connector = useWalletConnect();
   const { value: myProfileId } = useGetWalletProfileId(
     connector.accounts[0] || ""
@@ -53,45 +62,95 @@ function Feed({
       },
     },
   });
-  const { data: dataProfile, refetch: refetchProfile } = useQuery(
-    GET_DEFAULT_PROFILES,
-    {
-      variables: {
-        request: {
-          profileId: myProfileId,
-        },
-      },
-    }
+
+  const { avatar, isLoading: profileLoading } = useUpdate(
+    connector.accounts[0] || ""
   );
-
-  const {
-    userInfo,
-    updateUserInfo,
-    refetchUserInfo,
-    name,
-    description,
-    avatar,
-    isLoading: profileLoading,
-    uploadImage,
-  } = useUpdate(connector.accounts[0] || "");
-
-  const [isFeedRefreshing, setFeedRefreshing] = useState(false);
-
-  const dispatch = useAppDispatch();
 
   const refetchInfo = async () => {
     setFeedRefreshing(true);
-    await refetchFeeds();
-    await drafts.refetch();
+    if (skipValue === initialSkipValue) {
+      await refetchFeeds();
+    } else {
+      setFeed([]);
+      setSkipValue(0);
+    }
+    // await drafts.refetch();
     setFeedRefreshing(false);
   };
 
-  const openProfile = (id: string) => {
-    if (id == null) {
+  function createFeedData() {
+    const createdFeedData = dataFeeds?.data?.map((el: any) => {
+      const { isMirror, lensId, mirrorDescription } = el;
+
+      let index;
+      drafts?.data?.publications?.items?.forEach(
+        (element: any, _index: number) => {
+          if (element.id === lensId) {
+            index = _index;
+          }
+        }
+      );
+      if (drafts?.data?.publications?.items[Number(index)]) {
+        const { createdAt, profile, metadata, id, stats, mirrorOf } =
+          drafts?.data?.publications?.items[Number(index)];
+
+        return {
+          isUnpublishedPost: false,
+          key: id,
+          data: {
+            from: metadata?.attributes[4].value,
+            to: metadata?.attributes[3].value,
+            contractAddress: metadata?.attributes[1].value,
+            info: metadata?.description,
+            image: metadata?.attributes[9]?.value,
+            name: profile?.handle,
+            date: createdAt,
+            showDate: false,
+            messageType: metadata?.attributes[5].value,
+            itemType: "nft",
+            totalUpvotes: stats?.totalUpvotes,
+            totalMirror: stats?.totalAmountOfMirrors,
+            id: id,
+            profileId: profile?.id,
+            refetchInfo: refetchInfo,
+            txHash: metadata?.attributes[8].value,
+            blockchainType: metadata?.attributes[7].value,
+            isMirror: isMirror,
+            handleMirror: mirrorOf?.profile.ownedBy,
+            creator: profile.ownedBy,
+            mirrorDescription,
+          },
+        };
+      }
+    });
+
+    const filteredFeedData = createdFeedData.filter((item) => item != null);
+    return filteredFeedData;
+  }
+
+  function onEndReached() {
+    if (isFeedEnd) {
       return;
     }
-    navigation.navigate(`Profile`, { id });
-  };
+    setSkipValue(skipValue + takeFeedValue);
+  }
+
+  useEffect(() => {
+    if (dataFeeds?.data == null || drafts?.data?.publications?.items == null) {
+      return;
+    }
+    if (dataFeeds.data.length < 1) {
+      setIsFeedEnd(true);
+    }
+    const newFeed = createFeedData();
+    console.log("🔃", newFeed.length);
+    setFeed([...feed, ...newFeed]);
+  }, [drafts?.data?.publications?.items, dataFeeds?.data]);
+
+  useEffect(() => {
+    console.log(drafts?.data?.publications?.items?.length);
+  }, [drafts?.data?.publications?.items]);
 
   return (
     <SafeAreaView style={safeViewAndroid.AndroidSafeArea}>
@@ -119,66 +178,31 @@ function Feed({
           </Pressable>
         </View>
       </View>
-      <ScrollView
+
+      <FlatList
+        data={feed}
+        onEndReachedThreshold={itemFromBottomToFetch}
+        onEndReached={onEndReached}
         refreshControl={
           <RefreshControl
             onRefresh={refetchInfo}
             refreshing={isFeedRefreshing}
           />
         }
-      >
-        {dataFeeds ? (
-          dataFeeds?.data?.map((el: any) => {
-            const { isMirror, lensId, mirrorDescription } = el;
-
-            let index;
-            drafts?.data?.publications?.items?.forEach(
-              (element: any, _index: number) => {
-                if (element.id === lensId) {
-                  index = _index;
-                }
-              }
-            );
-            if (drafts?.data?.publications?.items[Number(index)]) {
-              const { createdAt, profile, metadata, id, stats, mirrorOf } =
-                drafts?.data?.publications?.items[Number(index)];
-
-              return (
-                <Post
-                  isUnpublishedPost={false}
-                  key={id}
-                  openProfile={openProfile}
-                  data={{
-                    from: metadata?.attributes[4].value,
-                    to: metadata?.attributes[3].value,
-                    contractAddress: metadata?.attributes[1].value,
-                    info: metadata?.description,
-                    image: metadata?.attributes[9]?.value,
-                    name: profile?.handle,
-                    date: createdAt,
-                    showDate: false,
-                    messageType: metadata?.attributes[5].value,
-                    itemType: "nft",
-                    totalUpvotes: stats?.totalUpvotes,
-                    totalMirror: stats?.totalAmountOfMirrors,
-                    id: id,
-                    profileId: profile?.id,
-                    refetchInfo: refetchInfo,
-                    txHash: metadata?.attributes[8].value,
-                    blockchainType: metadata?.attributes[7].value,
-                    isMirror: isMirror,
-                    handleMirror: mirrorOf?.profile.ownedBy,
-                    creator: profile.ownedBy,
-                    mirrorDescription,
-                  }}
-                ></Post>
-              );
-            }
-          })
-        ) : (
-          <AppLoader />
+        ListFooterComponent={() =>
+          isFeedFromBackLoading || drafts.loading ? (
+            <View className="py-3">
+              <ActivityIndicator
+                size={"large"}
+                color={Colors.main.background}
+              />
+            </View>
+          ) : null
+        }
+        renderItem={({ item }) => (
+          <Post isUnpublishedPost={false} data={item.data} key={item.id} />
         )}
-      </ScrollView>
+      />
     </SafeAreaView>
   );
 }
