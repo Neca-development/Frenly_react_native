@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, Text, Pressable } from "react-native";
+import { Pressable } from "react-native";
 import AvatarComponent, { IAvatarProps } from "./avatar.component";
 
 interface IAvatarWithLink extends IAvatarProps {

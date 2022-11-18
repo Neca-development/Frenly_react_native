@@ -73,6 +73,7 @@ const Post = React.memo((props: IPostProps) => {
   const { data, isUnpublishedPost, addPost, declinePost } = props;
   const [isCommentsCollapsed, changeCommentsCollapsed] = useState(true);
   const [isMirrorModalVisible, setMirrorModalVisible] = useState(false);
+  const [isLiked, setIsLiked] = useState<null | boolean>(null);
 
   const connector = useWalletConnect();
 
@@ -87,6 +88,7 @@ const Post = React.memo((props: IPostProps) => {
   } = useUpdate(data.creator);
   const [isLoading, setIsLoading] = useState(false);
   const [likePostToLens, dataLikes] = useMutation(LIKE_TO_POST);
+  const [likesCount, setLikesCount] = useState(0);
   const [cancelLikePostToLens, dataCancelLikes] =
     useMutation(CANCEL_LIKE_TO_POST);
   const [isLikeRequest, setIsLikeRequest] = useState(false);
@@ -115,25 +117,78 @@ const Post = React.memo((props: IPostProps) => {
     CREATE_MIRROR_TYPED_DATA
   );
 
-  const { data: publicationIsReact, refetch: refetchLikes } = useQuery(
-    GET_REACTIONS,
-    {
-      variables: {
-        request: {
-          publicationIds: [data.id],
-        },
-        requestReaction: {
-          profileId: myProfileId,
-        },
+  const { data: publicationIsReact } = useQuery(GET_REACTIONS, {
+    variables: {
+      request: {
+        publicationIds: [data.id],
       },
-      skip: typeof id == "number",
-    }
-  );
+      requestReaction: {
+        profileId: myProfileId,
+      },
+    },
+    skip: typeof id == "number",
+  });
   const [mirrorPost] = useMirrorPostMutation();
 
   function toggleCommentsCollapsed() {
     changeCommentsCollapsed(!isCommentsCollapsed);
   }
+
+  const likePost = async () => {
+    try {
+      setIsLiked(true);
+      setLikesCount(likesCount + 1);
+      setIsLikeRequest(true);
+      await likePostToLens({
+        variables: {
+          request: {
+            profileId: myProfileId,
+            reaction: "UPVOTE",
+            publicationId: data.id,
+          },
+        },
+      });
+
+      console.log("💖 LIKE");
+    } catch (error) {
+      setLikesCount(likesCount - 1);
+      setIsLiked(false);
+    } finally {
+      setIsLikeRequest(false);
+    }
+  };
+
+  const dislikePost = async () => {
+    try {
+      setIsLiked(false);
+      setLikesCount(likesCount - 1);
+      setIsLikeRequest(true);
+
+      await cancelLikePostToLens({
+        variables: {
+          request: {
+            profileId: myProfileId,
+            reaction: "UPVOTE",
+            publicationId: data.id,
+          },
+        },
+      });
+      console.log("💔 DISLIKE");
+    } catch (error) {
+      setIsLiked(false);
+      setLikesCount(likesCount + 1);
+      setIsLiked(true);
+    } finally {
+      setIsLikeRequest(false);
+    }
+  };
+
+  const checkPostIsLiked = () => {
+    if (isLiked !== null) {
+      return isLiked;
+    }
+    return publicationIsReact?.publications?.items[0]?.reaction === "UPVOTE";
+  };
 
   const likeHandler = async () => {
     if (!myProfileId || !data.id) {
@@ -144,41 +199,11 @@ const Post = React.memo((props: IPostProps) => {
       });
       return;
     }
-    setIsLikeRequest(true);
 
-    try {
-      if (publicationIsReact.publications.items[0].reaction == null) {
-        await likePostToLens({
-          variables: {
-            request: {
-              profileId: myProfileId,
-              reaction: "UPVOTE",
-              publicationId: data.id,
-            },
-          },
-        });
-        console.log("💖 LIKE");
-      } else if (
-        publicationIsReact.publications.items[0].reaction == "UPVOTE"
-      ) {
-        await cancelLikePostToLens({
-          variables: {
-            request: {
-              profileId: myProfileId,
-              reaction: "UPVOTE",
-              publicationId: data.id,
-            },
-          },
-        });
-        console.log("💔 DISLIKE");
-      }
-    } catch (error) {
-      console.log("🤬", error);
-    } finally {
-      await refetchLikes();
-      await refetchPost();
-      setIsLikeRequest(false);
+    if (checkPostIsLiked()) {
+      return dislikePost();
     }
+    return likePost();
   };
 
   const mirrorHandler = async (mirrorText: string) => {
@@ -241,6 +266,10 @@ const Post = React.memo((props: IPostProps) => {
     setRepostTwitterLink(createTwitterLink(data));
   }, [data]);
 
+  useEffect(() => {
+    setLikesCount(postData?.publication?.stats.totalUpvotes);
+  }, [postData?.publication?.stats.totalUpvotes]);
+
   return (
     <View className="flex-row items-start px-4 border-b border-border-color pt-2 pb-4">
       {isLoading && <AppLoader />}
@@ -252,16 +281,6 @@ const Post = React.memo((props: IPostProps) => {
         />
       )}
       {!isUnpublishedPost && (
-        // <Pressable
-        //   onPress={() => openProfile(data.profileId)}
-        //   className="mr-4 items-center"
-        // >
-        //   <AvatarComponent
-        //     isLoading={creatorLoading}
-        //     avatar={avatar || data.avatar}
-        //     size={SizesEnum.md}
-        //   />
-        // </Pressable>
         <AvatarWithLink
           profileId={data.profileId}
           isLoading={creatorLoading}
@@ -310,14 +329,12 @@ const Post = React.memo((props: IPostProps) => {
           </Pressable>
           {!isUnpublishedPost && (
             <PostControls
-              isLiked={
-                publicationIsReact?.publications?.items[0]?.reaction == "UPVOTE"
-              }
+              isLiked={checkPostIsLiked()}
               onLikePress={likeHandler}
               onCommentsPress={toggleCommentsCollapsed}
               onMirrorPress={() => setMirrorModalVisible(true)}
               commentsCount={comments?.publications?.items?.length}
-              likesCount={postData?.publication?.stats.totalUpvotes}
+              likesCount={likesCount}
               mirrorsCount={data.totalMirror}
               isLikeRequest={isLikeRequest}
               repostTwitterLink={repostTwitterLink}

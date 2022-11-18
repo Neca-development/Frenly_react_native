@@ -45,9 +45,6 @@ function Feed({
     take: takeFeedValue,
     skip: skipValue,
   });
-  if (feedsError) {
-    console.log("❌", feedsError);
-  }
 
   const connector = useWalletConnect();
   const { value: myProfileId } = useGetWalletProfileId(
@@ -144,13 +141,8 @@ function Feed({
       setIsFeedEnd(true);
     }
     const newFeed = createFeedData();
-    console.log("🔃", newFeed.length);
     setFeed([...feed, ...newFeed]);
   }, [drafts?.data?.publications?.items, dataFeeds?.data]);
-
-  useEffect(() => {
-    console.log(drafts?.data?.publications?.items?.length);
-  }, [drafts?.data?.publications?.items]);
 
   return (
     <SafeAreaView style={safeViewAndroid.AndroidSafeArea}>

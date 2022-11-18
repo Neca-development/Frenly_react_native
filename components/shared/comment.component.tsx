@@ -16,7 +16,6 @@ export interface IComment {
 const Comment = ({ metadata, profile, createdAt }: IComment) => {
   const { avatar, name, isLoading } = useUpdate(profile.ownedBy);
   const commentDate = moment(createdAt).fromNow(true);
-  console.log(profile);
   return (
     <ScrollView horizontal contentContainerStyle={{ width: "100%" }}>
       <View className="flex-1 flex-row items-center mb-2">
