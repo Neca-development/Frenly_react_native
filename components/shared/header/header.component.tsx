@@ -175,6 +175,10 @@ export default function Header(props: IHeaderProperties) {
     }
   };
 
+  const goToNFTs = () => {
+    navigation.navigate("NFTs");
+  };
+
   return (
     <>
       {isLoading && <AppLoader />}
@@ -227,7 +231,7 @@ export default function Header(props: IHeaderProperties) {
             </Text>
           </>
         )}
-
+        {isOwner && <Button title="My NFTs" style="mt-2" onPress={goToNFTs} />}
         {!isOwner &&
           (isFollow ? (
             <Button

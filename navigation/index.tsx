@@ -14,13 +14,13 @@ import * as React from "react";
 import { ColorSchemeName } from "react-native";
 import Auth from "../screens/auth.screen";
 import Feed from "../screens/feed.screen";
-
+import Profile from "../screens/profile";
 import ModalScreen from "../screens/modal.screen";
 import NotFoundScreen from "../screens/not-found.screen";
+import NFTsScreen from "../screens/nfts.screen";
+import NFTScreen from "../screens/nft.screen";
 import { RootStackParamList } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
-
-import Profile from "../screens/profile";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import AppLoader from "../components/app-loader.component";
 
@@ -98,11 +98,13 @@ function RootNavigator({
         component={Profile}
         options={{ headerShown: false }}
       />
+      <Stack.Screen name="NFT" component={NFTScreen} />
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
         options={{ title: "Oops!" }}
       />
+      <Stack.Screen name="NFTs" component={NFTsScreen} />
       <Stack.Group screenOptions={{ presentation: "modal" }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
       </Stack.Group>

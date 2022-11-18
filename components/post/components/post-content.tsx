@@ -1,6 +1,5 @@
 import React from "react";
 
-import postPlaceholder from "../../../assets/images/post-placeholder.png";
 import { SERVER_URL } from "../../../constants/Api";
 
 import { View, Text, Image, Pressable, Linking } from "react-native";
@@ -9,6 +8,7 @@ import { useUpdate } from "../../../hooks/use-update-user.hook";
 import moment from "moment";
 import SkeletonLoader from "expo-skeleton-loader";
 import renderMessage from "../../../helpers/render-message";
+import ContentImage from "../../shared/content-image.component";
 
 interface IPostContent {
   isLoading: boolean;
@@ -116,25 +116,13 @@ export default function PostContent(props: IPostContent) {
         {data.info}
       </Text>
 
-      {data.image ? (
-        <View className="relative mt-1">
-          <Image
-            source={{
-              uri: `${SERVER_URL}token-images/${data.image}`,
-            }}
-            resizeMode="cover"
-            className="h-[300px] rounded-lg overflow-hidden object-center"
-          />
-        </View>
-      ) : (
-        <View className="relative mt-1 items-center">
-          <Image
-            source={postPlaceholder}
-            className="h-[100px] rounded-lg overflow-hidden object-center"
-            resizeMode="contain"
-          />
-        </View>
-      )}
+      <ContentImage
+        source={
+          data.image && {
+            uri: `${SERVER_URL}token-images/${data.image}`,
+          }
+        }
+      />
     </>
   );
 }

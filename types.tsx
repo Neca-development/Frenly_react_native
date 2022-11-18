@@ -15,4 +15,5 @@ export type RootStackParamList = {
   Profile: { id: string; currentUser?: boolean };
   Modal: undefined;
   NotFound: undefined;
+  NFTs: undefined;
 };
