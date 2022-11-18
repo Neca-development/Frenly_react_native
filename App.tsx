@@ -37,7 +37,6 @@ const authLink = setContext(async (req, { headers }) => {
 const errorLink = onError(({ forward, operation, graphQLErrors }) => {
   console.log("graphQLErrors");
   graphQLErrors?.forEach(async (error) => {
-    // console.log(error);
     if (error.extensions.code == "UNAUTHENTICATED") {
       const token = await AsyncStorageLib.getItem("lens_refresh_token");
       const refreshTokens = await refreshAuth(token);
