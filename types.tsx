@@ -3,6 +3,8 @@
  * https://reactnavigation.org/docs/typescript/
  */
 
+import { IAlchemyResponse } from "./common/types/alchemy";
+
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}
@@ -15,4 +17,6 @@ export type RootStackParamList = {
   Profile: { id: string; currentUser?: boolean };
   Modal: undefined;
   NotFound: undefined;
+  NFTs: undefined;
+  NFT: { data: IAlchemyResponse };
 };

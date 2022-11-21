@@ -13,6 +13,7 @@ import Post from "../components/post/post";
 import safeViewAndroid from "../helpers/safe-view-android";
 import AvatarComponent from "../components/shared/avatar.component";
 import Colors from "../constants/Colors";
+import AppLoader from "../components/app-loader.component";
 import { useQuery } from "@apollo/client";
 import { useGetFilteredFeedQuery } from "../store/auth/auth.api";
 import { GET_PUBLICATIONS } from "../store/lens/get-publication.query";
@@ -39,6 +40,7 @@ function Feed({
   const {
     data: dataFeeds,
     refetch: refetchFeeds,
+    isLoading: isFeedsLoading,
     isFetching: isFeedFromBackLoading,
     error: feedsError,
   } = useGetFilteredFeedQuery({
@@ -195,6 +197,7 @@ function Feed({
           <Post isUnpublishedPost={false} data={item.data} key={item.id} />
         )}
       />
+      {isFeedsLoading && <AppLoader />}
     </SafeAreaView>
   );
 }

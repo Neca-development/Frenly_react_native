@@ -1,19 +1,24 @@
-import { configureStore } from '@reduxjs/toolkit'
-import { setupListeners } from '@reduxjs/toolkit/query'
+import { alchemyApi } from "./alchemy/alchemy.api";
+import { configureStore } from "@reduxjs/toolkit";
+import { setupListeners } from "@reduxjs/toolkit/query";
 
-import { authApi } from './auth/auth.api'
-import authSlice from './auth/auth.slice'
+import { authApi } from "./auth/auth.api";
+import authSlice from "./auth/auth.slice";
 
 export const store = configureStore({
   reducer: {
     auth: authSlice,
     [authApi.reducerPath]: authApi.reducer,
+    [alchemyApi.reducerPath]: alchemyApi.reducer,
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(authApi.middleware),
-})
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware()
+      .concat(authApi.middleware)
+      .concat(alchemyApi.middleware),
+});
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>
+export type RootState = ReturnType<typeof store.getState>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
-export type AppDispatch = typeof store.dispatch
-setupListeners(store.dispatch)
+export type AppDispatch = typeof store.dispatch;
+setupListeners(store.dispatch);
