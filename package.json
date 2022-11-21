@@ -22,6 +22,7 @@
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/native-stack": "^6.1.0",
     "@reduxjs/toolkit": "^1.8.5",
+    "@traderxyz/nft-swap-sdk": "^0.30.0",
     "@walletconnect/react-native-dapp": "^1.7.0",
     "@walletconnect/web3-provider": "^1.8.0",
     "apollo-link-context": "^1.0.20",
