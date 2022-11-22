@@ -1,97 +1,88 @@
-import { ETHEREUM_ADDRESS, TokenTypeEnum } from "@shared/lib";
-import type { SwappableAssetV4 } from "@traderxyz/nft-swap-sdk";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+
+import { IAlchemyResponse } from "./../common/types/alchemy";
 import { NftSwapV4 } from "@traderxyz/nft-swap-sdk";
-import { useCallback, useEffect, useState } from "react";
-import { useBlockchain } from "src/blockchain";
-interface ICreateOrderInput {
-  tokenAddressMaker: string;
-  tokenAddressTaker?: string;
-  tokenType: TokenTypeEnum;
-  tokenId: string;
+import type { SwappableAssetV4 } from "@traderxyz/nft-swap-sdk";
+import { ethers } from "ethers";
+import {
+  ETHEREUM_CHAIN_ID,
+  ETHEREUM_RPC_URL,
+  ETHEREUM_ADDRESS,
+} from "../constants/Api";
+
+enum TokenTypeEnum {
+  "ERC20" = "ERC20",
+  "ERC721" = "ERC721",
+  "ERC1155" = "ERC1155",
 }
-export const useCreateOrder = ({
-  tokenAddressMaker,
-  tokenAddressTaker = ETHEREUM_ADDRESS,
-  tokenId,
-  tokenType,
-}: ICreateOrderInput) => {
-  const [price, setPrice] = useState("");
-  const { account, signer, library, switchNetwork, ChainId, ethers } =
-    useBlockchain();
-  useEffect(() => {
-    if (Number.isNaN(Number(price)) && price.length > 0) {
-      setPrice("");
+
+export async function createOrder(
+  connector: any,
+  data: IAlchemyResponse,
+  sellPrice: string
+) {
+  try {
+    await connector.connect();
+    const CHAIN_ID = ETHEREUM_CHAIN_ID;
+    const tokenAddressTaker = ETHEREUM_ADDRESS;
+
+    const makerOrderERC721: SwappableAssetV4 = {
+      tokenAddress: data.contract.address,
+      tokenId: data.id.tokenId,
+      type: TokenTypeEnum.ERC721,
+    };
+    const makerOrderERC1155: SwappableAssetV4 = {
+      tokenAddress: data.contract.address,
+      tokenId: data.id.tokenId,
+      type: TokenTypeEnum.ERC1155,
+    };
+    let ethersInWei = String(
+      Number(ethers.utils.parseUnits(sellPrice.toString(), "ether"))
+    );
+    const makerOrder =
+      data?.contractMetadata?.tokenType == TokenTypeEnum.ERC1155
+        ? makerOrderERC1155
+        : makerOrderERC721;
+    const takerOrder: SwappableAssetV4 = {
+      tokenAddress: tokenAddressTaker,
+      amount: ethersInWei,
+      type: TokenTypeEnum.ERC20,
+    };
+
+    const provider = new WalletConnectProvider({
+      rpc: {
+        [CHAIN_ID]: ETHEREUM_RPC_URL,
+      },
+      chainId: CHAIN_ID,
+      connector: connector,
+      qrcode: false,
+    });
+    await provider.enable();
+    const ethers_provider = new ethers.providers.Web3Provider(provider);
+    const signer = ethers_provider.getSigner(connector.accounts[0]);
+    const nftSwapSdk = new NftSwapV4(ethers_provider, signer, CHAIN_ID);
+    const approvalStatusForMaker = await nftSwapSdk.loadApprovalStatus(
+      makerOrder,
+      connector.accounts[0] as string
+    );
+
+    if (!approvalStatusForMaker.contractApproved) {
+      const approvalTx = await nftSwapSdk.approveTokenOrNftByAsset(
+        makerOrder,
+        connector.accounts[0] as string
+      );
+      const approvalTxReceipt = await approvalTx.wait();
     }
-  }, [price]);
-  return {
-    price,
-    setPrice,
-    createOrder: useCallback(async () => {
-      try {
-        console.log(tokenAddressMaker, tokenId);
-        await switchNetwork(ChainId.Mainnet);
-        const makerOrderERC721: SwappableAssetV4 = {
-          tokenAddress: tokenAddressMaker,
-          tokenId,
-          type: TokenTypeEnum.ERC721,
-        };
-        const makerOrderERC1155: SwappableAssetV4 = {
-          tokenAddress: tokenAddressMaker,
-          tokenId,
-          type: TokenTypeEnum.ERC721,
-        };
-        const makerOrder =
-          tokenType == TokenTypeEnum.ERC1155
-            ? makerOrderERC1155
-            : makerOrderERC721;
-        const takerOrder: SwappableAssetV4 = {
-          tokenAddress: tokenAddressTaker,
-          amount: price + "0".repeat(17),
-          type: TokenTypeEnum.ERC20,
-        };
-        // @ts-ignore
-        const nftSwapSdk = new NftSwapV4(library, signer, ChainId.Mainnet);
-        console.log(makerOrder, takerOrder);
-        const approvalStatusForMaker = await nftSwapSdk.loadApprovalStatus(
-          makerOrder,
-          account as string
-        );
-        if (!approvalStatusForMaker.contractApproved) {
-          const approvalTx = await nftSwapSdk.approveTokenOrNftByAsset(
-            makerOrder,
-            account as string
-          );
-          const approvalTxReceipt = await approvalTx.wait();
-          console.log(approvalTxReceipt);
-        }
-        const order = nftSwapSdk.buildOrder(
-          makerOrder,
-          takerOrder,
-          account as string
-        );
-        console.log(order);
-        const signedOrder = await nftSwapSdk.signOrder(order);
-        const postedOrder = await nftSwapSdk.postOrder(
-          signedOrder,
-          ChainId.Mainnet
-        );
-        console.log(postedOrder);
-        console.log(signedOrder);
-      } catch {
-      } finally {
-        await switchNetwork(ChainId.Mumbai);
-      }
-    }, [
-      ChainId.Mainnet,
-      ChainId.Mumbai,
-      account,
-      library,
-      price,
-      signer,
-      tokenAddressMaker,
-      tokenAddressTaker,
-      tokenId,
-      tokenType,
-    ]),
-  };
-};
+
+    const order = nftSwapSdk.buildOrder(
+      makerOrder,
+      takerOrder,
+      String(connector.accounts[0])
+    );
+    const signedOrder = await nftSwapSdk.signOrder(order);
+
+    return signedOrder;
+  } catch (error) {
+    console.error(error);
+  }
+}

@@ -18,6 +18,7 @@ import { setTokens } from "../store/auth/auth.slice";
 import { login } from "../store/lens/auth/login-user";
 import { CREATE_PROFILE } from "../store/lens/create-profile.mutation";
 import { useAppDispatch } from "../store/store.hook";
+import { MUMBAI_CHAIN_ID, MUMBAI_RPC_URL } from "../constants/Api";
 
 const shortenAddress = (address: string) => {
   return `${address.slice(0, 6)}...${address.slice(
@@ -85,8 +86,8 @@ export default function Auth({ navigation }: RootTabScreenProps<"Auth">) {
     dispatch(setTokens({ ...dataLogin?.data }));
 
     const provider = new ethers.providers.JsonRpcProvider(
-      "https://polygon-mumbai.g.alchemy.com/v2/HCm-qNqCQm-NnbV9nHWxq9OnMHkUNvsg",
-      80001
+      MUMBAI_RPC_URL,
+      MUMBAI_CHAIN_ID
     );
     await login(connector.accounts[0], provider, connector);
 

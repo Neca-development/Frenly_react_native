@@ -1,4 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/dist/query/react";
+import { SignedNftOrderV4 } from "@traderxyz/nft-swap-sdk";
 import { setUser } from "./auth.slice";
 
 import { baseQueryWithReauth } from "./base-query";
@@ -296,6 +297,25 @@ export const authApi = createApi({
         };
       },
     }),
+    createZeroexPost: builder.mutation<
+      any,
+      {
+        image?: string;
+        walletAddress: string;
+        price: string;
+        collectionName: string;
+        signedObject: SignedNftOrderV4;
+      }
+    >({
+      query: (args) => {
+        return {
+          url: `/rest/zeroex/sell`,
+          method: "POST",
+          body: args,
+          credentials: "omit",
+        };
+      },
+    }),
   }),
 });
 
@@ -322,4 +342,5 @@ export const {
   useSubscribeUserMutation,
   useUnSubscribeUserMutation,
   useGetFilteredFeedQuery,
+  useCreateZeroexPostMutation,
 } = authApi;

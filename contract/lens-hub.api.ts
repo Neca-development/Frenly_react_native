@@ -1,3 +1,4 @@
+import { MUMBAI_CHAIN_ID, MUMBAI_RPC_URL } from "./../constants/Api";
 import "@ethersproject/shims";
 // import { useCall, useContractFunction } from '@usedapp/core'
 import { Contract, ethers } from "ethers";
@@ -7,8 +8,8 @@ import { lensHubABI, lensHubContract } from "./lens-hub.contract";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 
 const provider = new ethers.providers.JsonRpcProvider(
-  "https://polygon-mumbai.g.alchemy.com/v2/HCm-qNqCQm-NnbV9nHWxq9OnMHkUNvsg",
-  80001
+  MUMBAI_RPC_URL,
+  MUMBAI_CHAIN_ID
 );
 const lensContract = new Contract(lensHubContract, lensHubABI, provider);
 
@@ -25,10 +26,9 @@ function createLensPostId(receipt: any) {
 async function getContractWithSigner(connector: any): Promise<Contract> {
   const provider = new WalletConnectProvider({
     rpc: {
-      80001:
-        "https://polygon-mumbai.g.alchemy.com/v2/HCm-qNqCQm-NnbV9nHWxq9OnMHkUNvsg",
+      [MUMBAI_CHAIN_ID]: MUMBAI_RPC_URL,
     },
-    chainId: 80001,
+    chainId: MUMBAI_CHAIN_ID,
     connector: connector,
     qrcode: false,
   });
