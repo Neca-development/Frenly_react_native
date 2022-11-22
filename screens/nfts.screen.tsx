@@ -1,7 +1,8 @@
-import { fetchBaseQuery } from "@reduxjs/toolkit/dist/query";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
-import React, { useEffect } from "react";
-import { View, Text, SafeAreaView, FlatList, Pressable } from "react-native";
+import React from "react";
+
+import { View, SafeAreaView, FlatList, Text } from "react-native";
+import AppLoader from "../components/app-loader.component";
 import NFTItem from "../components/nft-item.component";
 import safeViewAndroid from "../helpers/safe-view-android";
 import { useGetNftsForUserQuery } from "../store/alchemy/alchemy.api";
@@ -9,13 +10,14 @@ import { useGetNftsForUserQuery } from "../store/alchemy/alchemy.api";
 export default function NFTsScreen() {
   const connector = useWalletConnect();
 
-  const { data } = useGetNftsForUserQuery({
-    address: "0x276417be271dbEB696CB97cdA7c6982FD89E6BD4",
+  const { data, isLoading, error } = useGetNftsForUserQuery({
+    address: connector.accounts[0],
   });
+  console.log(error);
   return (
     <SafeAreaView style={safeViewAndroid.AndroidSafeArea}>
       <View className="w-full px-4 pb-3">
-        {data?.ownedNfts && (
+        {data?.ownedNfts?.length > 1 ? (
           <FlatList
             numColumns={2}
             keyExtractor={(item) => String(item.id.tokenId)}
@@ -23,8 +25,11 @@ export default function NFTsScreen() {
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => <NFTItem {...item} />}
           />
+        ) : (
+          <Text className="text-3xl">No nfts</Text>
         )}
       </View>
+      {isLoading && <AppLoader />}
     </SafeAreaView>
   );
 }
