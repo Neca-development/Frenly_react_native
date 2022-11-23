@@ -22,6 +22,7 @@ import Toast from "react-native-toast-message";
 
 export default function NFTScreen({
   route,
+  navigation,
 }: RouteProp<RootStackParamList, "NFT">) {
   const [sellPrice, setSellPrice] = useState<null | string>(null);
   const data = route.params.data as IAlchemyResponse;
@@ -43,20 +44,24 @@ export default function NFTScreen({
         data?.metadata?.collection?.name ||
         data?.contractMetadata?.openSea?.collectionName ||
         "";
-      await createZeroexPost({
+      const res = await createZeroexPost({
         image: data?.metadata?.image,
         collectionName,
         price: sellPrice,
-        signedObject,
+        signedObject: JSON.stringify(signedObject),
         walletAddress: connector.accounts[0],
       });
+      if (res?.error) {
+        throw Error(res.error.data.error);
+      }
+      console.log("✅", res);
+      navigation.navigate("NFTs");
       Toast.show({
         type: "success",
         text1: "✅ Success",
         text2: "Sell order created",
         visibilityTime: 8000,
       });
-      setSellPrice(null);
     } catch (error) {
       console.log(error);
       Toast.show({

@@ -304,12 +304,12 @@ export const authApi = createApi({
         walletAddress: string;
         price: string;
         collectionName: string;
-        signedObject: SignedNftOrderV4;
+        signedObject: string;
       }
     >({
       query: (args) => {
         return {
-          url: `/rest/zeroex/sell`,
+          url: `/zeroex/sell`,
           method: "POST",
           body: args,
           credentials: "omit",
