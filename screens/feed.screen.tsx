@@ -93,7 +93,7 @@ function Feed({
         }
       );
       if (postType != PostTypeEnum.NFT_TRANSFER) {
-        return el;
+        return { key: el.id, ...el };
       }
       if (drafts?.data?.publications?.items[Number(index)]) {
         const { createdAt, profile, metadata, id, stats, mirrorOf } =
