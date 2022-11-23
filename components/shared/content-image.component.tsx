@@ -1,7 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image } from "react-native";
-
-import postPlaceholder from "../../assets/images/post-placeholder.png";
 
 export type IContentImage = {
   source?: { uri: string };
@@ -9,11 +7,14 @@ export type IContentImage = {
 
 export default function ContentImage(props: IContentImage) {
   const { source } = props;
+
+  const [loadError, setLoadError] = useState(false);
   return (
     <View>
-      {source ? (
+      {source && !loadError ? (
         <View className="relative mt-1">
           <Image
+            onError={() => setLoadError(true)}
             source={source}
             resizeMode="cover"
             className="h-[300px] rounded-lg overflow-hidden object-center"
