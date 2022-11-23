@@ -31,11 +31,12 @@ import {
 import ModalComponent from "../modal/modal.component";
 import AppLoader from "../app-loader.component";
 import AvatarComponent from "../shared/avatar.component";
-import { SizesEnum } from "../../common/helpers";
+import { PostTypeEnum, SizesEnum } from "../../common/helpers";
 import createTwitterLink from "../../helpers/create-twitter-link";
 import AvatarWithLink from "../shared/avatar-with-link.component";
 
 export interface IPostData {
+  postType: PostTypeEnum;
   avatar?: any;
   profileId: string;
   name: string;
@@ -64,13 +65,14 @@ export interface IPostData {
 }
 interface IPostProps {
   isUnpublishedPost: boolean;
-  addPost(): void;
-  declinePost(): void;
+  addPost?(): void;
+  declinePost?(): void;
   data: IPostData;
+  postType: PostTypeEnum;
 }
 
 const Post = React.memo((props: IPostProps) => {
-  const { data, isUnpublishedPost, addPost, declinePost } = props;
+  const { data, isUnpublishedPost, addPost, declinePost, postType } = props;
   const [isCommentsCollapsed, changeCommentsCollapsed] = useState(true);
   const [isMirrorModalVisible, setMirrorModalVisible] = useState(false);
   const [isLiked, setIsLiked] = useState<null | boolean>(null);
@@ -293,6 +295,7 @@ const Post = React.memo((props: IPostProps) => {
           isLoading={creatorLoading}
           userName={username || data.name}
           data={data}
+          postType={postType}
         />
         {isUnpublishedPost && (
           <View className="flex-row mt-2">

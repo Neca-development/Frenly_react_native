@@ -22,7 +22,8 @@ import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useGetWalletProfileId } from "../contract/lens-hub.api";
 import { useUpdate } from "../hooks/use-update-user.hook";
-import { SizesEnum } from "../common/helpers";
+import { PostTypeEnum, SizesEnum } from "../common/helpers";
+import PostSwitcher from "../components/post-switcher/post-switcher";
 
 const takeFeedValue = 20;
 const initialSkipValue = 0;
@@ -47,6 +48,7 @@ function Feed({
     take: takeFeedValue,
     skip: skipValue,
   });
+  // console.log(dataFeeds);
 
   const connector = useWalletConnect();
   const { value: myProfileId } = useGetWalletProfileId(
@@ -80,8 +82,8 @@ function Feed({
 
   function createFeedData() {
     const createdFeedData = dataFeeds?.data?.map((el: any) => {
-      const { isMirror, lensId, mirrorDescription } = el;
-
+      const { isMirror, lensId, mirrorDescription, postType } = el;
+      // console.log(postType);
       let index;
       drafts?.data?.publications?.items?.forEach(
         (element: any, _index: number) => {
@@ -90,6 +92,9 @@ function Feed({
           }
         }
       );
+      if (postType != PostTypeEnum.NFT_TRANSFER) {
+        return el;
+      }
       if (drafts?.data?.publications?.items[Number(index)]) {
         const { createdAt, profile, metadata, id, stats, mirrorOf } =
           drafts?.data?.publications?.items[Number(index)];
@@ -97,6 +102,7 @@ function Feed({
         return {
           isUnpublishedPost: false,
           key: id,
+          postType: postType,
           data: {
             from: metadata?.attributes[4].value,
             to: metadata?.attributes[3].value,
@@ -194,7 +200,7 @@ function Feed({
           ) : null
         }
         renderItem={({ item }) => (
-          <Post isUnpublishedPost={false} data={item.data} key={item.id} />
+          <PostSwitcher isUnpublishedPost={false} key={item.key} {...item} />
         )}
       />
       {isFeedsLoading && <AppLoader />}

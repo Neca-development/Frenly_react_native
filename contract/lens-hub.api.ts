@@ -1,6 +1,5 @@
 import { MUMBAI_CHAIN_ID, MUMBAI_RPC_URL } from "./../constants/Api";
 import "@ethersproject/shims";
-// import { useCall, useContractFunction } from '@usedapp/core'
 import { Contract, ethers } from "ethers";
 import { useEffect, useState } from "react";
 import "react-native-get-random-values";
