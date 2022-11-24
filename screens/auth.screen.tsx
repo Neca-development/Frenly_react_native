@@ -103,15 +103,6 @@ export default function Auth({ navigation }: RootTabScreenProps<"Auth">) {
     navigation.navigate("Feed");
   }
 
-  // useEffect(() => {
-  //   // if (connector.accounts[0]) navigation.push("Feed");
-  //   console.log(connector.accounts[0]);
-  // }, connector.accounts);
-
-  // useEffect(() => {
-  //   console.log(dataNonce, "nonce change");
-  // }, [dataNonce]);
-
   return (
     <View className="container flex-col justify-between items-center h-screen px-5 py-20">
       <View className="flex-1 item-center justify-center">

@@ -8,17 +8,18 @@ import {
   Linking,
   Pressable,
 } from "react-native";
-import { SizesEnum } from "../common/helpers";
 import Button from "../components/shared/button.component";
 import NFTImage from "../components/shared/nft-image.component";
 import safeViewAndroid from "../helpers/safe-view-android";
+import Toast from "react-native-toast-message";
+
+import { SizesEnum } from "../common/helpers";
 import { RootStackParamList } from "../types";
 import type { RouteProp } from "@react-navigation/native";
 import { IAlchemyResponse } from "../common/types/alchemy";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import { createOrder } from "../contract/nft.api";
 import { useCreateZeroexPostMutation } from "../store/auth/auth.api";
-import Toast from "react-native-toast-message";
 
 export default function NFTScreen({
   route,

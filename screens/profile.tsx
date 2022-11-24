@@ -114,7 +114,6 @@ export default function Profile(props: IProfileProps) {
       if (res?.error) {
         throw res.error;
       }
-      console.log(res);
 
       console.log("✅ unfollow");
       refetchIsFollow();

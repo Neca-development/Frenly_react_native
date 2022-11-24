@@ -13,11 +13,10 @@ export default function NFTsScreen() {
   const { data, isLoading, error } = useGetNftsForUserQuery({
     address: connector.accounts[0],
   });
-  console.log(error);
   return (
     <SafeAreaView style={safeViewAndroid.AndroidSafeArea}>
       <View className="w-full px-4 pb-3">
-        {data?.ownedNfts?.length > 1 ? (
+        {data?.ownedNfts?.length > 0 ? (
           <FlatList
             numColumns={2}
             keyExtractor={(item) => String(item.id.tokenId)}
@@ -26,7 +25,7 @@ export default function NFTsScreen() {
             renderItem={({ item }) => <NFTItem {...item} />}
           />
         ) : (
-          <Text className="text-3xl">No nfts</Text>
+          !isLoading && <Text className="text-3xl">No nfts</Text>
         )}
       </View>
       {isLoading && <AppLoader />}
