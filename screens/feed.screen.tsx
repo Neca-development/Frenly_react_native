@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,13 +9,14 @@ import {
   View,
 } from "react-native";
 import EyesIcon from "../assets/icons/eyes";
-import Post from "../components/post/post";
 import safeViewAndroid from "../helpers/safe-view-android";
 import AvatarComponent from "../components/shared/avatar.component";
 import Colors from "../constants/Colors";
 import AppLoader from "../components/app-loader.component";
-import { useQuery } from "@apollo/client";
-import { useGetFilteredFeedQuery } from "../store/auth/auth.api";
+import PostSwitcher from "../components/post-switcher/post-switcher";
+
+import { useLazyQuery } from "@apollo/client";
+import { authApi } from "../store/auth/auth.api";
 import { GET_PUBLICATIONS } from "../store/lens/get-publication.query";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import { RootStackParamList } from "../types";
@@ -23,9 +24,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useGetWalletProfileId } from "../contract/lens-hub.api";
 import { useUpdate } from "../hooks/use-update-user.hook";
 import { PostTypeEnum, SizesEnum } from "../common/helpers";
-import PostSwitcher from "../components/post-switcher/post-switcher";
 
-const takeFeedValue = 20;
+// Base fetch settings
+const takeFeedValue = 15;
 const initialSkipValue = 0;
 const itemFromBottomToFetch = 4;
 
@@ -35,29 +36,34 @@ function Feed({
   const [skipValue, setSkipValue] = useState(initialSkipValue);
   const [isFeedRefreshing, setFeedRefreshing] = useState(false);
   const [feed, setFeed] = useState<any[]>([]);
-  const [isFiltrationLoading, setFiltrationLoading] = useState(false);
   const [isFeedEnd, setIsFeedEnd] = useState(false);
+  const [isFeedsLoading, setIsFeedsLoading] = useState(false);
+  const [isFeedsUpdating, setFeedsUpdating] = useState(false);
 
-  const {
-    data: dataFeeds,
-    refetch: refetchFeeds,
-    isLoading: isFeedsLoading,
-    isFetching: isFeedFromBackLoading,
-    error: feedsError,
-  } = useGetFilteredFeedQuery({
-    take: takeFeedValue,
-    skip: skipValue,
-  });
-  // console.log(dataFeeds);
+  const [getFilteredFeed, dataFeeds] =
+    authApi.endpoints.getFilteredFeed.useLazyQuery();
+
+  function createFeed(backRes: any, lensRes: any) {
+    if (backRes?.data == null || lensRes?.data?.publications?.items == null) {
+      return;
+    }
+    console.log("😀");
+    if (backRes.data.length < 1) {
+      setIsFeedEnd(true);
+    }
+    const newFeed = createFeedData(backRes, lensRes);
+    setFeed([...feed, ...newFeed]);
+  }
 
   const connector = useWalletConnect();
   const { value: myProfileId } = useGetWalletProfileId(
     connector.accounts[0] || ""
   );
-  const drafts = useQuery(GET_PUBLICATIONS, {
+
+  const [loadDrafts] = useLazyQuery(GET_PUBLICATIONS, {
     variables: {
       request: {
-        publicationIds: dataFeeds?.data
+        publicationIds: dataFeeds?.data?.data
           .filter((el: any) => el.lensId != null)
           .map((el: any) => el.lensId),
       },
@@ -68,24 +74,11 @@ function Feed({
     connector.accounts[0] || ""
   );
 
-  const refetchInfo = async () => {
-    setFeedRefreshing(true);
-    if (skipValue === initialSkipValue) {
-      await refetchFeeds();
-    } else {
-      setFeed([]);
-      setSkipValue(0);
-    }
-    // await drafts.refetch();
-    setFeedRefreshing(false);
-  };
-
-  function createFeedData() {
-    const createdFeedData = dataFeeds?.data?.map((el: any) => {
+  function createFeedData(backRes: any, lensRes: any) {
+    const createdFeedData = backRes?.data?.map((el: any) => {
       const { isMirror, lensId, mirrorDescription, postType } = el;
-      // console.log(postType);
       let index;
-      drafts?.data?.publications?.items?.forEach(
+      lensRes?.data?.publications?.items?.forEach(
         (element: any, _index: number) => {
           if (element.id === lensId) {
             index = _index;
@@ -93,11 +86,11 @@ function Feed({
         }
       );
       if (postType != PostTypeEnum.NFT_TRANSFER) {
-        return { key: el.id, ...el };
+        return { key: el.id, refetchInfo: refetchInfo, ...el };
       }
-      if (drafts?.data?.publications?.items[Number(index)]) {
+      if (lensRes?.data?.publications?.items[Number(index)]) {
         const { createdAt, profile, metadata, id, stats, mirrorOf } =
-          drafts?.data?.publications?.items[Number(index)];
+          lensRes?.data?.publications?.items[Number(index)];
 
         return {
           isUnpublishedPost: false,
@@ -130,27 +123,43 @@ function Feed({
       }
     });
 
-    const filteredFeedData = createdFeedData.filter((item) => item != null);
+    const filteredFeedData = createdFeedData.filter(
+      (item: any) => item != null
+    );
     return filteredFeedData;
   }
 
-  function onEndReached() {
-    if (isFeedEnd) {
+  async function loadFeedData(skipValue: number) {
+    const backRes = await getFilteredFeed({
+      skip: skipValue,
+      take: takeFeedValue,
+    });
+    const lensRes = await loadDrafts();
+    await createFeed(backRes.data, lensRes);
+  }
+  const refetchInfo = useCallback(() => {
+    setFeed([]);
+    setSkipValue(initialSkipValue);
+    loadFeedData(initialSkipValue);
+  }, []);
+
+  async function onEndReached() {
+    if (isFeedEnd || isFeedsUpdating) {
       return;
     }
+    setFeedsUpdating(true);
+    // skipValue fails to update
     setSkipValue(skipValue + takeFeedValue);
+    await loadFeedData(skipValue + takeFeedValue);
+
+    setFeedsUpdating(false);
   }
 
   useEffect(() => {
-    if (dataFeeds?.data == null || drafts?.data?.publications?.items == null) {
-      return;
-    }
-    if (dataFeeds.data.length < 1) {
-      setIsFeedEnd(true);
-    }
-    const newFeed = createFeedData();
-    setFeed([...feed, ...newFeed]);
-  }, [drafts?.data?.publications?.items, dataFeeds?.data]);
+    setIsFeedsLoading(true);
+    loadFeedData(skipValue);
+    setIsFeedsLoading(false);
+  }, []);
 
   return (
     <SafeAreaView style={safeViewAndroid.AndroidSafeArea}>
@@ -190,7 +199,7 @@ function Feed({
           />
         }
         ListFooterComponent={() =>
-          isFeedFromBackLoading || drafts.loading ? (
+          isFeedsUpdating ? (
             <View className="py-3">
               <ActivityIndicator
                 size={"large"}

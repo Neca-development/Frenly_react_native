@@ -1,5 +1,4 @@
 import { createApi } from "@reduxjs/toolkit/dist/query/react";
-import { SignedNftOrderV4 } from "@traderxyz/nft-swap-sdk";
 import { setUser } from "./auth.slice";
 
 import { baseQueryWithReauth } from "./base-query";
@@ -316,6 +315,24 @@ export const authApi = createApi({
         };
       },
     }),
+    removeZeroexPost: builder.mutation<any, { contentId: string }>({
+      query: (args) => {
+        return {
+          url: `zeroex/decline/${args.contentId}`,
+          method: "DELETE",
+          credentials: "omit",
+        };
+      },
+    }),
+    acceptZeroexOrder: builder.mutation<any, { contentId: string }>({
+      query: (args) => {
+        return {
+          url: `/zeroex/accept/${args.contentId}`,
+          method: "POST",
+          credentials: "omit",
+        };
+      },
+    }),
   }),
 });
 
@@ -343,4 +360,6 @@ export const {
   useUnSubscribeUserMutation,
   useGetFilteredFeedQuery,
   useCreateZeroexPostMutation,
+  useRemoveZeroexPostMutation,
+  useAcceptZeroexOrderMutation,
 } = authApi;

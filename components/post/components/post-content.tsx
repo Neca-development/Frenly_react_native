@@ -81,7 +81,7 @@ export default function PostContent(props: IPostContent) {
       {postType === PostTypeEnum.NFT_TRANSFER ? (
         <PostLensText data={data} />
       ) : (
-        <PostZeroexText postType={postType} />
+        <PostZeroexText postType={postType} from={data.from} to={data.to} />
       )}
 
       <ContentImage

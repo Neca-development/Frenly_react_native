@@ -30,7 +30,6 @@ import {
 } from "../unpublished-posts/create-post.utils";
 import ModalComponent from "../modal/modal.component";
 import AppLoader from "../app-loader.component";
-import AvatarComponent from "../shared/avatar.component";
 import { PostTypeEnum, SizesEnum } from "../../common/helpers";
 import createTwitterLink from "../../helpers/create-twitter-link";
 import AvatarWithLink from "../shared/avatar-with-link.component";
