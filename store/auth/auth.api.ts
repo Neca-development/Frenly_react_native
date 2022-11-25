@@ -283,7 +283,7 @@ export const authApi = createApi({
         };
       },
     }),
-    createCommentMetadata: builder.query<
+    createCommentMetadata: builder.mutation<
       any,
       { lensId: string; comment: string }
     >({

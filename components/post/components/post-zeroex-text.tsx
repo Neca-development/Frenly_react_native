@@ -1,6 +1,9 @@
 import React from "react";
-import { View, Text } from "react-native";
+
+import { useNavigation } from "@react-navigation/native";
+import { View, Text, Pressable } from "react-native";
 import { PostTypeEnum } from "../../../common/helpers";
+import { useGetWalletProfileId } from "../../../contract/lens-hub.api";
 import { useUpdate } from "../../../hooks/use-update-user.hook";
 
 interface IPostZeroexText {
@@ -10,12 +13,25 @@ interface IPostZeroexText {
 }
 
 export default function PostZeroexText(props: IPostZeroexText) {
+  const navigation = useNavigation();
+
   const { name } = useUpdate(
     props.postType === PostTypeEnum.BUY_EVENT
       ? props?.from || ""
       : props?.to || ""
   );
   const { postType } = props;
+
+  const { value: profileId } = useGetWalletProfileId(
+    props.postType === PostTypeEnum.BUY_EVENT
+      ? props?.from || ""
+      : props?.to || ""
+  );
+
+  const openProfile = () =>
+    navigation.navigate("Profile", {
+      id: profileId as string,
+    });
 
   function textSwitcher() {
     switch (postType) {
@@ -29,9 +45,11 @@ export default function PostZeroexText(props: IPostZeroexText) {
         return (
           <>
             <Text className="text-base font-semibold ">
-              🎊 Just sold my NFT to
+              🎊 Just sold my NFT to{" "}
             </Text>
-            <Text className="text-base font-semibold text-main"> {name} </Text>
+            <Pressable onPress={openProfile}>
+              <Text className="text-base font-semibold text-main">{name}</Text>
+            </Pressable>
           </>
         );
       case PostTypeEnum.BUY_EVENT:
@@ -40,8 +58,9 @@ export default function PostZeroexText(props: IPostZeroexText) {
             <Text className="text-base font-semibold ">
               🎊 Just bought new NFT from{" "}
             </Text>
-
-            <Text className="text-base font-semibold text-main"> {name} </Text>
+            <Pressable onPress={openProfile}>
+              <Text className="text-base font-semibold text-main">{name}</Text>
+            </Pressable>
           </>
         );
     }
@@ -49,7 +68,7 @@ export default function PostZeroexText(props: IPostZeroexText) {
   return (
     <View className="flex-row flex-wrap">
       {textSwitcher()}
-      <Text className="text-base font-semibold ">via Frenly</Text>
+      <Text className="text-base font-semibold "> via Frenly</Text>
     </View>
   );
 }

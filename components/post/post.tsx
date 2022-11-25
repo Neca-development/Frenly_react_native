@@ -219,6 +219,7 @@ const Post = React.memo((props: IPostProps) => {
     // setIsDescriptionView(false)
     try {
       setIsLoading(true);
+
       const typeD = await mirrorPublication({
         variables: {
           request: {
@@ -320,7 +321,7 @@ const Post = React.memo((props: IPostProps) => {
             onPress={() =>
               Linking.openURL(
                 data.blockchainType == "ETHEREUM"
-                  ? `https://rinkeby.etherscan.io/tx/${data.txHash}`
+                  ? `https://etherscan.io//tx/${data.txHash}`
                   : `https://mumbai.polygonscan.com/tx/${data.txHash}`
               )
             }

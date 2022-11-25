@@ -2,7 +2,10 @@ import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import SendIcon from "../assets/icons/send-icon";
-import { getLensCommentId } from "../contract/lens-hub.api";
+import {
+  getLensCommentId,
+  useGetWalletProfileId,
+} from "../contract/lens-hub.api";
 import Comment, { IComment } from "./shared/comment.component";
 import {
   createLensCommentIdParams,
@@ -24,12 +27,14 @@ interface ICommentsProps {
 
 function Comments(props: ICommentsProps) {
   const { data, refetchComment, pubId, profileId } = props;
-
   const dispatch = useAppDispatch();
-
-  const [comments, setComments] = useState([]);
-  const [commentValue, setCommentValue] = useState("");
   const connector = useWalletConnect();
+  const { value: myProfileId } = useGetWalletProfileId(
+    connector.accounts[0] || ""
+  );
+
+  const [comments, setComments] = useState<any>([]);
+  const [commentValue, setCommentValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -48,6 +53,7 @@ function Comments(props: ICommentsProps) {
           lensId: String(pubId),
         })
       );
+
       const contentURI = contentMetadata.data.data;
 
       const createCommentRequest = {
@@ -67,14 +73,22 @@ function Comments(props: ICommentsProps) {
       const signature = await getSignatureFromTypedData(connector, typedData);
       const signatureAfterSplit = splitSignature(signature);
 
-      const getCommentParams = createLensCommentIdParams(
+      const getCommentParams = await createLensCommentIdParams(
         typedData,
         signatureAfterSplit
       );
       await getLensCommentId(connector, getCommentParams);
 
+      setComments([
+        ...comments,
+        {
+          metadata: { content: commentValue },
+          profile: { ownedBy: connector.accounts[0], id: myProfileId },
+          createdAt: Date.now(),
+        },
+      ]);
+
       setCommentValue("");
-      refetchComment();
       console.log("✅ Success");
       Toast.show({
         type: "success",
@@ -97,7 +111,6 @@ function Comments(props: ICommentsProps) {
     <View className="py-4 relative">
       {isLoading && <AppLoader />}
       <Text className="text-xl font-bold mb-4">Comments</Text>
-      {/* {newComment && <Comment {...newComment} />} */}
       {comments?.map((comment: IComment) => (
         <Comment key={comment.id} {...comment} />
       ))}

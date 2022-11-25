@@ -1,10 +1,11 @@
-import moment from "moment";
 import React from "react";
+
+import moment from "moment";
+import AvatarWithLink from "./avatar-with-link.component";
+
 import { ScrollView, Text, View } from "react-native";
 import { useUpdate } from "../../hooks/use-update-user.hook";
-import AvatarComponent from "./avatar.component";
 import { SizesEnum } from "../../common/helpers";
-import AvatarWithLink from "./avatar-with-link.component";
 //
 export interface IComment {
   metadata: any;
