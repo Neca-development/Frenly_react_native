@@ -232,25 +232,28 @@ export default function Header(props: IHeaderProperties) {
             <Text className="text-base font-normal text-gray mb-5 text-center m-auto mt-4">
               Followers: {userInfo?.data?.totalFollowers ?? 0}
             </Text>
+
+            {isOwner && (
+              <Button title="My NFTs" style="mt-2" onPress={goToNFTs} />
+            )}
+            {!isOwner &&
+              (isFollow ? (
+                <Button
+                  title="Unfollow"
+                  style="mt-2"
+                  onPress={unfollowHandle}
+                  disabled={isFollowUnFollowLoading}
+                />
+              ) : (
+                <Button
+                  title="Follow"
+                  style="mt-2"
+                  onPress={followHandle}
+                  disabled={isFollowUnFollowLoading}
+                />
+              ))}
           </>
         )}
-        {isOwner && <Button title="My NFTs" style="mt-2" onPress={goToNFTs} />}
-        {!isOwner &&
-          (isFollow ? (
-            <Button
-              title="Unfollow"
-              style="mt-2"
-              onPress={unfollowHandle}
-              disabled={isFollowUnFollowLoading}
-            />
-          ) : (
-            <Button
-              title="Follow"
-              style="mt-2"
-              onPress={followHandle}
-              disabled={isFollowUnFollowLoading}
-            />
-          ))}
       </View>
     </>
   );
