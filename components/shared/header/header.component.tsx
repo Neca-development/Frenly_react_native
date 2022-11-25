@@ -21,6 +21,7 @@ import { logout } from "../../../store/auth/auth.slice";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import { SizesEnum } from "../../../common/helpers";
 import { useGetENSByAddress } from "../../../hooks/use-get-ens-by-address.hook";
+import SettingsIcon from "../../../assets/icons/settings-icon";
 
 export interface IHeaderProperties {
   title: string;
@@ -194,7 +195,7 @@ export default function Header(props: IHeaderProperties) {
 
           {isOwner ? (
             <Pressable onPress={toggleEditMode}>
-              {isEdit ? <CloseIcon /> : <EditIcon />}
+              {isEdit ? <CloseIcon /> : <SettingsIcon />}
             </Pressable>
           ) : (
             <View className="w-[24px] h-[25px]" />
