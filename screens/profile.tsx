@@ -76,7 +76,6 @@ export default function Profile(props: IProfileProps) {
     },
     { skip: dataProfile?.profile?.ownedBy == null }
   );
-
   const followHandler = async () => {
     try {
       setFollowUnFollowLoading(true);

@@ -20,6 +20,8 @@ import { IAlchemyResponse } from "../common/types/alchemy";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
 import { createOrder } from "../contract/nft.api";
 import { useCreateZeroexPostMutation } from "../store/auth/auth.api";
+import useSwitchNetwork from "../hooks/use-switch-network.hook";
+import { ETHEREUM_CHAIN_ID, MUMBAI_HEX_CHAIN_ID } from "../constants/Api";
 
 export default function NFTScreen({
   route,
@@ -31,12 +33,14 @@ export default function NFTScreen({
   const [createZeroexPost] = useCreateZeroexPostMutation();
 
   const connector = useWalletConnect();
+  const { switchNetwork } = useSwitchNetwork();
 
   async function onSellPress() {
     try {
       if (sellPrice == null) {
         throw Error("Enter the selling price");
       }
+      switchNetwork(ETHEREUM_CHAIN_ID);
       const signedObject = await createOrder(connector, data, sellPrice);
       if (!signedObject) {
         throw Error("Error creating order");
@@ -70,6 +74,8 @@ export default function NFTScreen({
         text1: `❌ ${error?.message ? error.message : error}`,
         visibilityTime: 8000,
       });
+    } finally {
+      switchNetwork(MUMBAI_HEX_CHAIN_ID);
     }
   }
 

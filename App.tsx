@@ -1,3 +1,5 @@
+import React from "react";
+
 import {
   ApolloClient,
   ApolloProvider,
@@ -5,21 +7,19 @@ import {
   HttpLink,
   InMemoryCache,
 } from "@apollo/client";
-
 import { onError } from "@apollo/client/link/error";
-import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import { setContext } from "apollo-link-context";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
+import { refreshAuth } from "./store/lens/auth/refresh-token.mutation";
+import { store } from "./store/store";
 
+import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
 import Toast from "react-native-toast-message";
-import { refreshAuth } from "./store/lens/auth/refresh-token.mutation";
-import { store } from "./store/store";
 
 const httpLink = new HttpLink({ uri: "https://api-mumbai.lens.dev" });
 // example how you can pass in the x-access-token into requests using `ApolloLink`
@@ -72,7 +72,7 @@ export default function App() {
           <SafeAreaProvider>
             <Navigation colorScheme={colorScheme} />
             <StatusBar />
-            <Toast />
+            <Toast visibilityTime={10000} />
           </SafeAreaProvider>
         </Provider>
       </ApolloProvider>

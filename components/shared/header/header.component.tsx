@@ -1,24 +1,26 @@
 /* eslint-disable sonarjs/cognitive-complexity */
+
+import * as ImagePicker from "expo-image-picker";
+import EditIcon from "../../../assets/icons/edit-icon";
+import CloseIcon from "../../../assets/icons/close-icon";
+import Button from "../button.component";
+import Toast from "react-native-toast-message";
+import PencilIcon from "../../../assets/icons/pencil-icon";
+import AppLoader from "../../app-loader.component";
+import HeaderEdit from "./header-edit/header-edit.component";
+import AvatarComponent from "../avatar.component";
+import ArrowBack from "../../../assets/icons/arrowBack";
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View, TextInput } from "react-native";
-import ArrowBack from "../../../assets/icons/arrowBack";
 import { SERVER_URL } from "../../../constants/Api";
 import { useUpdate } from "../../../hooks/use-update-user.hook";
 import { useAppDispatch } from "../../../store/store.hook";
 import { logout } from "../../../store/auth/auth.slice";
 import { useWalletConnect } from "@walletconnect/react-native-dapp";
-import AvatarComponent from "../avatar.component";
 import { SizesEnum } from "../../../common/helpers";
-import EditIcon from "../../../assets/icons/edit-icon";
-import CloseIcon from "../../../assets/icons/close-icon";
-import Button from "../button.component";
-import Toast from "react-native-toast-message";
-import * as ImagePicker from "expo-image-picker";
-import PencilIcon from "../../../assets/icons/pencil-icon";
-import AppLoader from "../../app-loader.component";
-import HeaderEdit from "./header-edit/header-edit.component";
+import { useGetENSByAddress } from "../../../hooks/use-get-ens-by-address.hook";
 
 export interface IHeaderProperties {
   title: string;
@@ -27,7 +29,7 @@ export interface IHeaderProperties {
   isOwner?: boolean;
   accountId?: string;
   nickname?: string;
-  address?: string;
+  address: string;
   followHandle?: () => void;
   unfollowHandle?: () => void;
   followers?: number;
@@ -57,6 +59,7 @@ export default function Header(props: IHeaderProperties) {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const connector = useWalletConnect();
+  const ens = useGetENSByAddress({ address });
 
   const {
     userInfo,
@@ -178,7 +181,7 @@ export default function Header(props: IHeaderProperties) {
   const goToNFTs = () => {
     navigation.navigate("NFTs");
   };
-
+  console.log(ens);
   return (
     <>
       {isLoading && <AppLoader />}
@@ -187,7 +190,7 @@ export default function Header(props: IHeaderProperties) {
           <Pressable onPress={() => navigation.goBack()}>
             <ArrowBack />
           </Pressable>
-          <Text className="text-xl font-bold ">{nameValue}</Text>
+          <Text className="text-xl font-bold ">{ens || nameValue}</Text>
 
           {isOwner ? (
             <Pressable onPress={toggleEditMode}>

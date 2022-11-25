@@ -13,13 +13,19 @@ import AvatarWithLink from "../shared/avatar-with-link.component";
 import Button from "../shared/button.component";
 import PostContent from "./components/post-content";
 import Toast from "react-native-toast-message";
+import { useNavigation } from "@react-navigation/native";
 import { NftSwapV4, SwappableAssetV4 } from "@traderxyz/nft-swap-sdk";
-import { ETHEREUM_CHAIN_ID, ETHEREUM_RPC_URL } from "../../constants/Api";
+import {
+  ETHEREUM_CHAIN_ID,
+  ETHEREUM_RPC_URL,
+  MUMBAI_HEX_CHAIN_ID,
+} from "../../constants/Api";
 import { TokenTypeEnum } from "../../contract/nft.api";
 import { ethers } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useGetWalletProfileId } from "../../contract/lens-hub.api";
 import AppLoader from "../app-loader.component";
+import useSwitchNetwork from "../../hooks/use-switch-network.hook";
 
 export interface Signature {
   signatureType: number;
@@ -69,6 +75,9 @@ export default function PostZeroex(props: IPostZeroex) {
   );
 
   const connector = useWalletConnect();
+  const navigation = useNavigation();
+  const { switchNetwork } = useSwitchNetwork();
+
   const {
     name: username,
     avatar,
@@ -101,6 +110,7 @@ export default function PostZeroex(props: IPostZeroex) {
 
   async function onBuyPress() {
     try {
+      await switchNetwork(ETHEREUM_CHAIN_ID);
       setLoading(true);
       const CHAIN_ID = ETHEREUM_CHAIN_ID;
       // await switchNetwork(ChainId.Mainnet)
@@ -122,24 +132,9 @@ export default function PostZeroex(props: IPostZeroex) {
       const ethers_provider = new ethers.providers.Web3Provider(provider);
       const signer = ethers_provider.getSigner(connector.accounts[0]);
       const nftSwapSdk = new NftSwapV4(ethers_provider, signer, CHAIN_ID);
-
-      // @ts-ignore
-      // if (tokenAddressTaker !== ETHEREUM_ADDRESS) {
-      //   const approvalStatusForMaker = await nftSwapSdk.loadApprovalStatus(
-      //     takerOrder,
-      //     account as string
-      //   );
-      //   if (!approvalStatusForMaker.contractApproved) {
-      //     const approvalTx = await nftSwapSdk.approveTokenOrNftByAsset(
-      //       takerOrder,
-      //       account as string
-      //     );
-      //     await approvalTx.wait();
-      //   }
-      // }
       const parsedSignedOrder = JSON.parse(props.signedObject);
       const fillTx = await nftSwapSdk.fillSignedOrder(parsedSignedOrder);
-      const res = await nftSwapSdk.awaitTransactionHash(fillTx.hash);
+      await nftSwapSdk.awaitTransactionHash(fillTx.hash);
       const backRes = await acceptZeroexOrder({ contentId: String(props.id) });
       if (backRes.error) {
         throw backRes;
@@ -157,8 +152,15 @@ export default function PostZeroex(props: IPostZeroex) {
           text1: "😥 You don`t have enough ETHs to Buy this NFT.",
         });
         console.log("😥 ", error);
+      } else if (error.message === "WRONG_CHAIN") {
+        // navigation.navigate("Auth");
+        Toast.show({
+          type: "error",
+          text1: "😢 Wrong network",
+          text2: "Please switch network to Ethereum Mainnet & connect again",
+        });
       } else {
-        console.log("🤬 95", error);
+        console.log("🤬 164", error);
         Toast.show({
           type: "error",
           text1: "😢 Something went wrong. Try again.",
@@ -166,6 +168,7 @@ export default function PostZeroex(props: IPostZeroex) {
       }
     } finally {
       setLoading(false);
+      switchNetwork(MUMBAI_HEX_CHAIN_ID);
     }
   }
 

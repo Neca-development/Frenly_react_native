@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, ScrollView, RefreshControl } from "react-native";
+import { PostTypeEnum } from "../../common/helpers";
 import Colors from "../../constants/Colors";
 import Post from "../post/post";
 
@@ -36,8 +37,8 @@ export default function UserPosts(props: IUserPosts) {
           <Post
             isUnpublishedPost={false}
             key={postId}
+            postType={PostTypeEnum.NFT_TRANSFER}
             data={{
-              //   avatar: mockImg,
               from: metadata?.attributes[4].value,
               to: metadata?.attributes[3].value,
               contractAddress: metadata?.attributes[1].value,

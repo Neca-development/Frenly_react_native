@@ -6,4 +6,5 @@ export const ETHEREUM_CHAIN_ID = 1;
 export const ETHEREUM_RPC_URL = `https://eth-mainnet.g.alchemy.com/v2/${NODE_ETH_API_KEY}`;
 
 export const MUMBAI_CHAIN_ID = 80001;
+export const MUMBAI_HEX_CHAIN_ID = 13881;
 export const MUMBAI_RPC_URL = `https://polygon-mumbai.g.alchemy.com/v2/HCm-qNqCQm-NnbV9nHWxq9OnMHkUNvsg`;
